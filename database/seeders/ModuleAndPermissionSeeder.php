@@ -19,11 +19,12 @@ class ModuleAndPermissionSeeder extends Seeder
         $superAdmin = User::query()->where('email', 'admin@chessx.test')->firstOrFail();
         $modules = [
             'dashboard' => ['name' => 'Dashboard', 'sort_order' => 10, 'permissions' => ['read']],
-            'users' => ['name' => 'User Management', 'sort_order' => 20, 'permissions' => ['read', 'view_super_admin', 'create', 'update', 'delete']],
+            'users' => ['name' => 'User Management', 'sort_order' => 20, 'permissions' => ['read', 'view_super_admin', 'create', 'update', 'delete', 'restore']],
             'roles' => ['name' => 'Role Management', 'sort_order' => 30, 'permissions' => ['read', 'create', 'update', 'delete', 'assign_permissions']],
             'permissions' => ['name' => 'Permission Management', 'sort_order' => 40, 'permissions' => ['read', 'create', 'update', 'delete']],
             'modules' => ['name' => 'Module Management', 'sort_order' => 50, 'permissions' => ['read', 'create', 'update', 'delete']],
             'branding' => ['name' => 'Site Branding', 'sort_order' => 60, 'permissions' => ['read', 'update']],
+            'player_profiles' => ['name' => 'Player Profiles', 'sort_order' => 70, 'permissions' => ['read', 'update']],
         ];
 
         foreach ($modules as $moduleSlug => $moduleData) {

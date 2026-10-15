@@ -22,6 +22,7 @@ class UserService {
 
         if (params?.filters?.role) query.set('role', params.filters.role);
         if (params?.filters?.status) query.set('status', params.filters.status);
+        if (params?.filters?.account) query.set('account', params.filters.account);
         return apiRequest(`/management/users?${query.toString()}`);
     }
 
@@ -44,6 +45,11 @@ class UserService {
 
     async deleteUser(id: string): Promise<boolean> {
         await apiRequest(`/management/users/${id}`, { method: 'DELETE' });
+        return true;
+    }
+
+    async restoreUser(id: string): Promise<boolean> {
+        await apiRequest(`/management/users/${id}/restore`, { method: 'PUT' });
         return true;
     }
 

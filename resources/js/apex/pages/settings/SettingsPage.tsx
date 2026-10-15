@@ -1,3 +1,5 @@
+import type { SharedData } from '@/types';
+import { usePage } from '@inertiajs/react';
 import React, { useState } from 'react';
 import {
   Settings,
@@ -6,12 +8,9 @@ import {
   Bell,
   Palette,
   CreditCard,
-  Users,
   Webhook,
   Key,
-  Sliders,
   Save,
-  Check,
   Copy,
   Eye,
   EyeOff,
@@ -24,18 +23,32 @@ import { Select } from '../../components/ui/Select';
 import { Badge } from '../../components/ui/Badge';
 import { useTheme } from '../../context/ThemeContext';
 import { useToast } from '../../context/ToastContext';
+import { ApiError, apiRequest } from '../../services/apiClient';
+
+type SettingsTab = 'general' | 'profile' | 'security' | 'notifications' | 'appearance' | 'billing' | 'integrations' | 'api';
 
 export const SettingsPage: React.FC = () => {
   const { mode, setMode, compactMode, setCompactMode } = useTheme();
   const { toast } = useToast();
+  const { auth } = usePage<SharedData>().props;
 
-  const [activeTab, setActiveTab] = useState<
-    'general' | 'profile' | 'security' | 'notifications' | 'appearance' | 'billing' | 'team' | 'integrations' | 'api'
-  >('general');
+  const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
 
   const [apiKeyVisible, setApiKeyVisible] = useState(false);
+  const [profile, setProfile] = useState({
+    name: auth.user.name,
+    username: auth.user.username,
+    email: auth.user.email,
+    display_name: auth.user.profile.display_name ?? '',
+    language: auth.user.profile.language,
+    timezone: auth.user.profile.timezone ?? '',
+    date_of_birth: auth.user.profile.date_of_birth ?? '',
+    profile_visibility: auth.user.profile.profile_visibility,
+  });
+  const [profileErrors, setProfileErrors] = useState<Record<string, string>>({});
+  const [savingProfile, setSavingProfile] = useState(false);
 
-  const tabs = [
+  const tabs: { id: SettingsTab; label: string; icon: React.ReactNode }[] = [
     { id: 'general', label: 'General', icon: <Settings className="w-4 h-4" /> },
     { id: 'profile', label: 'Profile', icon: <User className="w-4 h-4" /> },
     { id: 'security', label: 'Security & 2FA', icon: <Shield className="w-4 h-4" /> },
@@ -46,9 +59,31 @@ export const SettingsPage: React.FC = () => {
     { id: 'api', label: 'API Keys', icon: <Key className="w-4 h-4" /> },
   ];
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success('Configuration saved successfully');
+
+    if (activeTab !== 'profile') {
+      toast.info('This settings section will be connected in a later phase.');
+      return;
+    }
+
+    setSavingProfile(true);
+    setProfileErrors({});
+
+    try {
+      await apiRequest('/settings/profile', {
+        method: 'PATCH',
+        body: JSON.stringify(profile),
+      });
+      toast.success('Profile updated successfully');
+    } catch (error) {
+      if (error instanceof ApiError) {
+        setProfileErrors(Object.fromEntries(Object.entries(error.errors).map(([field, messages]) => [field, messages[0]])));
+      }
+      toast.error(error instanceof Error ? error.message : 'Could not update profile');
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   return (
@@ -58,7 +93,7 @@ export const SettingsPage: React.FC = () => {
         subtitle="Manage account preferences, appearance, security protocols, API credentials, and billing."
         breadcrumbs={[{ label: 'System' }, { label: 'Settings' }]}
         actions={
-          <Button size="sm" onClick={handleSave} leftIcon={<Save className="w-3.5 h-3.5" />}>
+          <Button size="sm" onClick={handleSave} isLoading={savingProfile} leftIcon={<Save className="w-3.5 h-3.5" />}>
             Save Changes
           </Button>
         }
@@ -70,7 +105,7 @@ export const SettingsPage: React.FC = () => {
           {tabs.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id)}
               className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
                 activeTab === tab.id
                   ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold shadow-xs'
@@ -116,25 +151,98 @@ export const SettingsPage: React.FC = () => {
 
           {activeTab === 'profile' && (
             <Card>
-              <CardHeader title="Admin Profile" description="Your personal identity and credentials" />
+              <CardHeader title="My Profile" description="Your personal identity and account credentials" />
               <CardBody className="space-y-4 text-xs">
                 <div className="flex items-center gap-4">
                   <img
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80"
-                    alt="Alexander Wright"
+                    src={auth.user.avatar}
+                    alt={profile.name}
                     className="w-16 h-16 rounded-full object-cover ring-2 ring-indigo-500"
                   />
                   <div>
-                    <Button variant="outline" size="xs">
-                      Change Avatar
-                    </Button>
-                    <p className="text-[11px] text-slate-400 mt-1">Recommended 300x300 JPG or PNG</p>
+                    <p className="font-semibold text-slate-900 dark:text-white">{profile.name}</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Avatar changes will be added with the complete player profile form.</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <Input label="Full Name" defaultValue="Alexander Wright" />
-                  <Input label="Email Address" defaultValue="alexander@apexenterprises.io" />
+                  <Input
+                    label="Full Name"
+                    value={profile.name}
+                    onChange={event => setProfile(current => ({ ...current, name: event.target.value }))}
+                    error={profileErrors.name}
+                  />
+                  <Input
+                    label="Email Address"
+                    type="email"
+                    value={profile.email}
+                    onChange={event => setProfile(current => ({ ...current, email: event.target.value }))}
+                    error={profileErrors.email}
+                  />
+                </div>
+                <Input
+                  label="Username"
+                  value={profile.username}
+                  disabled={!auth.user.username_can_be_changed}
+                  onChange={event => setProfile(current => ({ ...current, username: event.target.value.toLowerCase() }))}
+                  error={profileErrors.username}
+                  helperText={
+                    auth.user.username_can_be_changed
+                      ? 'Use 3–30 lowercase letters, numbers, or underscores. You can change it once every 30 days.'
+                      : `Your next username change is available on ${auth.user.username_change_available_at}.`
+                  }
+                />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <Input
+                    label="Display Name"
+                    value={profile.display_name}
+                    onChange={event => setProfile(current => ({ ...current, display_name: event.target.value }))}
+                    error={profileErrors.display_name}
+                    helperText="This name will be shown on your public chess profile."
+                  />
+                  <Select
+                    label="Language"
+                    value={profile.language}
+                    onChange={event => setProfile(current => ({ ...current, language: event.target.value }))}
+                    error={profileErrors.language}
+                    options={[
+                      { value: 'en', label: 'English' },
+                      { value: 'hi', label: 'Hindi' },
+                      { value: 'gu', label: 'Gujarati' },
+                    ]}
+                  />
+                  <Select
+                    label="Timezone"
+                    value={profile.timezone}
+                    onChange={event => setProfile(current => ({ ...current, timezone: event.target.value }))}
+                    error={profileErrors.timezone}
+                    options={[
+                      { value: '', label: 'Use system timezone' },
+                      { value: 'Asia/Kolkata', label: 'Asia/Kolkata' },
+                      { value: 'UTC', label: 'UTC' },
+                      { value: 'Europe/London', label: 'Europe/London' },
+                      { value: 'America/New_York', label: 'America/New York' },
+                    ]}
+                  />
+                  <Input
+                    label="Date of Birth"
+                    type="date"
+                    value={profile.date_of_birth}
+                    onChange={event => setProfile(current => ({ ...current, date_of_birth: event.target.value }))}
+                    error={profileErrors.date_of_birth}
+                    helperText="You must be at least 13 years old. Your date of birth is always private."
+                  />
+                  <Select
+                    label="Profile Visibility"
+                    value={profile.profile_visibility}
+                    onChange={event => setProfile(current => ({ ...current, profile_visibility: event.target.value as 'public' | 'private' }))}
+                    error={profileErrors.profile_visibility}
+                    helperText="Controls whether other players can view your future public chess profile."
+                    options={[
+                      { value: 'public', label: 'Public' },
+                      { value: 'private', label: 'Private' },
+                    ]}
+                  />
                 </div>
               </CardBody>
             </Card>

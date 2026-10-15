@@ -1,0 +1,21 @@
+---
+description: Require all user-facing ChessX features to use the existing Apex/ChessX UI template
+alwaysApply: true
+---
+
+# Use the ChessX UI Template
+
+- All new user-facing pages, forms, dialogs, settings, authentication screens, and management modules must use the existing Apex/ChessX UI template and design system.
+- Reuse components from `resources/js/apex/components` and follow the layout, spacing, colors, typography, dark mode, responsive behavior, and modal patterns already used by active ChessX pages.
+- Do not send users to Laravel starter-kit UI pages or introduce starter-kit layouts into the visible application.
+- When Laravel starter-kit functionality already exists, adapt its backend behavior into the Apex/ChessX interface.
+- Keep authorization on the backend and also hide unavailable navigation items, buttons, and actions in the UI.
+- Reuse an existing ChessX page or component before creating a new visual pattern.
+- Preserve the current Inertia/Laravel integration even when a screen is rendered inside the Apex React shell.
+
+## Example
+
+- Bad: link the Apex header's Profile action to a Laravel starter-kit profile screen.
+- Good: build the profile form with Apex components inside the ChessX shell and submit it to the existing Laravel profile endpoint.
+
+Only depart from this rule when the user explicitly asks for a different interface.

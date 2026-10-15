@@ -40,6 +40,16 @@ export interface SharedData {
 export interface User {
     id: number;
     name: string;
+    username: string;
+    username_can_be_changed: boolean;
+    username_change_available_at: string | null;
+    profile: {
+        display_name: string | null;
+        language: string;
+        timezone: string | null;
+        date_of_birth: string | null;
+        profile_visibility: 'public' | 'private';
+    };
     email: string;
     avatar?: string;
     role?: string;

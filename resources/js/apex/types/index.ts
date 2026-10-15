@@ -15,6 +15,7 @@ export interface User {
     roleId: number;
     roleSlug?: string;
     status: 'active' | 'inactive' | 'pending' | 'suspended';
+    archivedAt?: string | null;
     lastLogin: string;
     createdAt: string;
     twoFactorEnabled: boolean;

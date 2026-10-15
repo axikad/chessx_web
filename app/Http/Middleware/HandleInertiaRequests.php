@@ -40,7 +40,7 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
-        $user = $request->user()?->loadMissing('role');
+        $user = $request->user()?->loadMissing(['role', 'profile']);
 
         return array_merge(parent::share($request), [
             ...parent::share($request),
@@ -50,12 +50,22 @@ class HandleInertiaRequests extends Middleware
                 'user' => $user ? [
                     'id' => $user->id,
                     'name' => $user->name,
+                    'username' => $user->username,
+                    'username_can_be_changed' => $user->canChangeUsername(),
+                    'username_change_available_at' => $user->usernameChangeAvailableAt()?->toDateString(),
                     'email' => $user->email,
                     'email_verified_at' => $user->email_verified_at,
                     'avatar' => $user->avatar_path
                         ? Storage::disk('public')->url($user->avatar_path)
                         : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=4f46e5&color=fff',
                     'role' => $user->role?->name ?? 'Unassigned',
+                    'profile' => [
+                        'display_name' => $user->profile?->display_name,
+                        'language' => $user->profile?->language ?? 'en',
+                        'timezone' => $user->profile?->timezone,
+                        'date_of_birth' => $user->profile?->date_of_birth?->toDateString(),
+                        'profile_visibility' => $user->profile?->profile_visibility ?? 'public',
+                    ],
                 ] : null,
                 'permissions' => $user ? ($user->isSuperAdmin() ? ['*'] : $user->role?->permissionSlugs() ?? []) : [],
             ],

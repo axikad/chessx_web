@@ -1,4 +1,4 @@
-import { Check, Edit2, Shield, Trash2, UserPlus } from 'lucide-react';
+import { ArchiveRestore, Check, Edit2, Shield, Trash2, UserPlus } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { Badge, BadgeVariant } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -16,7 +16,10 @@ export const UserListPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [roleFilter, setRoleFilter] = useState('all');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [accountFilter, setAccountFilter] = useState('active');
     const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+    const [restoreUserId, setRestoreUserId] = useState<string | null>(null);
+    const [isRestoring, setIsRestoring] = useState(false);
     const [formOpen, setFormOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
 
@@ -25,12 +28,13 @@ export const UserListPage: React.FC = () => {
     const canCreateUsers = can('users.create');
     const canUpdateUsers = can('users.update');
     const canDeleteUsers = can('users.delete');
+    const canRestoreUsers = can('users.restore');
 
     const loadUsers = useCallback(async () => {
         setIsLoading(true);
         try {
             const res = await userService.getUsers({
-                filters: { role: roleFilter, status: statusFilter },
+                filters: { role: roleFilter, status: statusFilter, account: accountFilter },
             });
             setUsers(res.data);
         } catch {
@@ -38,7 +42,7 @@ export const UserListPage: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [roleFilter, showToast, statusFilter]);
+    }, [accountFilter, roleFilter, showToast, statusFilter]);
 
     useEffect(() => {
         loadUsers();
@@ -53,6 +57,21 @@ export const UserListPage: React.FC = () => {
             loadUsers();
         } catch {
             toast.error('Could not remove user');
+        }
+    };
+
+    const handleRestore = async () => {
+        if (!restoreUserId) return;
+        setIsRestoring(true);
+        try {
+            await userService.restoreUser(restoreUserId);
+            toast.success('User account restored');
+            setRestoreUserId(null);
+            loadUsers();
+        } catch {
+            toast.error('Could not restore user');
+        } finally {
+            setIsRestoring(false);
         }
     };
 
@@ -101,7 +120,14 @@ export const UserListPage: React.FC = () => {
             key: 'status',
             header: 'Status',
             sortable: true,
-            render: (row) => getStatusBadge(row.status),
+            render: (row) =>
+                row.archivedAt ? (
+                    <Badge variant="neutral" dot>
+                        Archived
+                    </Badge>
+                ) : (
+                    getStatusBadge(row.status)
+                ),
         },
         {
             key: 'twoFactorEnabled',
@@ -132,14 +158,14 @@ export const UserListPage: React.FC = () => {
         },
     ];
 
-    if (canUpdateUsers || canDeleteUsers) {
+    if (canUpdateUsers || canDeleteUsers || canRestoreUsers) {
         columns.push({
             key: 'actions',
             header: 'Actions',
             align: 'right',
             render: (row) => (
                 <div className="flex items-center justify-end gap-1" onClick={(e) => e.stopPropagation()}>
-                    {canUpdateUsers && (
+                    {!row.archivedAt && canUpdateUsers && (
                         <button
                             onClick={() => {
                                 setEditingUser(row);
@@ -151,13 +177,22 @@ export const UserListPage: React.FC = () => {
                             <Edit2 className="h-3.5 w-3.5" />
                         </button>
                     )}
-                    {canDeleteUsers && (
+                    {!row.archivedAt && canDeleteUsers && (
                         <button
                             onClick={() => setDeleteUserId(row.id)}
                             className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-rose-600 dark:hover:bg-slate-800"
                             title="Remove User"
                         >
                             <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                    )}
+                    {row.archivedAt && canRestoreUsers && (
+                        <button
+                            onClick={() => setRestoreUserId(row.id)}
+                            className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-emerald-600 dark:hover:bg-slate-800"
+                            title="Restore User"
+                        >
+                            <ArchiveRestore className="h-3.5 w-3.5" />
                         </button>
                     )}
                 </div>
@@ -186,7 +221,7 @@ export const UserListPage: React.FC = () => {
             />
 
             <DataTable
-                title="Active Organization Users"
+                title={accountFilter === 'archived' ? 'Archived Accounts' : 'Active Organization Users'}
                 columns={columns}
                 data={users}
                 keyField="id"
@@ -194,6 +229,15 @@ export const UserListPage: React.FC = () => {
                 searchPlaceholder="Search member by name, email, role..."
                 customFilters={
                     <div className="flex items-center gap-2">
+                        <select
+                            value={accountFilter}
+                            onChange={(e) => setAccountFilter(e.target.value)}
+                            className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-xs text-slate-700 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                        >
+                            <option value="active">Active Accounts</option>
+                            {canRestoreUsers && <option value="archived">Archived Accounts</option>}
+                        </select>
+
                         <select
                             value={roleFilter}
                             onChange={(e) => setRoleFilter(e.target.value)}
@@ -225,7 +269,19 @@ export const UserListPage: React.FC = () => {
                     onClose={() => setDeleteUserId(null)}
                     onConfirm={handleDelete}
                     title="Remove Member"
-                    message="Are you sure you want to revoke system access for this team member?"
+                    message="This account will be archived and can be restored later. Continue?"
+                />
+            )}
+            {canRestoreUsers && (
+                <ConfirmDialog
+                    isOpen={Boolean(restoreUserId)}
+                    onClose={() => setRestoreUserId(null)}
+                    onConfirm={handleRestore}
+                    title="Restore Account"
+                    message="Restore this account and allow the user to access the system again?"
+                    confirmText="Restore"
+                    variant="primary"
+                    isLoading={isRestoring}
                 />
             )}
             {(canCreateUsers || canUpdateUsers) && (

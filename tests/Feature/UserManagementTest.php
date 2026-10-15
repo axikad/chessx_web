@@ -24,7 +24,40 @@ test('super admin can create update list and delete users', function () {
         'password' => '', 'role_id' => $role->id, 'status' => 'inactive',
     ])->assertOk()->assertJsonPath('data.status', 'inactive');
     $this->deleteJson(route('management.users.destroy', $user))->assertOk();
-    $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    $this->assertSoftDeleted($user);
+});
+
+test('authorized users can list and restore archived accounts', function () {
+    $role = Role::factory()->create();
+    $actor = User::factory()->for($role)->create();
+    $target = User::factory()->for(Role::factory()->user())->create();
+    $read = Permission::factory()->create(['slug' => 'users.read']);
+    $restore = Permission::factory()->create(['slug' => 'users.restore']);
+    app(RolePermissionService::class)->sync($role, [$read->id, $restore->id], $actor);
+    $target->delete();
+
+    $this->actingAs($actor)
+        ->getJson(route('management.users.index', ['account' => 'archived']))
+        ->assertOk()
+        ->assertJsonFragment(['email' => $target->email]);
+
+    $this->putJson(route('management.users.restore', $target->id))
+        ->assertOk()
+        ->assertJsonPath('data.email', $target->email);
+
+    expect($target->fresh())->not->toBeNull();
+});
+
+test('users without restore permission cannot recover archived accounts', function () {
+    $actor = User::factory()->for(Role::factory()->user())->create();
+    $target = User::factory()->create();
+    $target->delete();
+
+    $this->actingAs($actor)
+        ->putJson(route('management.users.restore', $target->id))
+        ->assertForbidden();
+
+    $this->assertSoftDeleted($target);
 });
 
 test('ordinary users cannot access user management', function () {

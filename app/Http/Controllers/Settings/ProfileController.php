@@ -4,40 +4,57 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Inertia\Inertia;
-use Inertia\Response;
+use Illuminate\Support\Facades\DB;
 
 class ProfileController extends Controller
 {
     /**
-     * Show the user's profile settings page.
-     */
-    public function edit(Request $request): Response
-    {
-        return Inertia::render('settings/profile', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => $request->session()->get('status'),
-        ]);
-    }
-
-    /**
      * Update the user's profile settings.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request): JsonResponse|RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $userData = $request->safe()->only(['name', 'username', 'email']);
+        $profileData = $request->safe()->only(['display_name', 'language', 'timezone', 'date_of_birth', 'profile_visibility']);
+        $profileData['language'] = $profileData['language'] ?? 'en';
+        $profileData['profile_visibility'] = $profileData['profile_visibility'] ?? 'public';
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        DB::transaction(function () use ($user, $userData, $profileData): void {
+            $user->fill($userData);
+
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
+            }
+
+            if ($user->isDirty('username')) {
+                $user->username_changed_at = now();
+            }
+
+            $user->save();
+            $user->profile()->updateOrCreate([], $profileData);
+        });
+
+        $user->load('profile');
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'data' => [
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                    'profile' => $user->profile,
+                    'usernameCanBeChanged' => $user->canChangeUsername(),
+                    'usernameChangeAvailableAt' => $user->usernameChangeAvailableAt()?->toDateString(),
+                ],
+                'message' => 'Profile updated successfully.',
+            ]);
         }
 
-        $request->user()->save();
-
-        return to_route('profile.edit');
+        return to_route('settings.index');
     }
 
     /**

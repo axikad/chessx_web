@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\PlayerProfileController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\UserController;
@@ -22,6 +23,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('branding', [SiteSettingController::class, 'show'])->name('branding.show');
         Route::post('branding', [SiteSettingController::class, 'update'])->name('branding.update');
         Route::get('user-role-options', [UserController::class, 'roleOptions'])->name('users.role-options');
+        Route::put('users/{user}/restore', [UserController::class, 'restore'])->name('users.restore');
+        Route::get('users/{user}/profile', [PlayerProfileController::class, 'show'])->name('users.profile.show');
+        Route::patch('users/{user}/profile', [PlayerProfileController::class, 'update'])->name('users.profile.update');
         Route::apiResource('users', UserController::class);
         Route::put('roles/{role}/permissions', [RoleController::class, 'syncPermissions'])->name('roles.permissions.update');
         Route::apiResource('roles', RoleController::class);

@@ -40,7 +40,9 @@ class UserController extends Controller
 
     private function userList(Request $request): JsonResponse
     {
-        $users = User::query()->with('role')
+        $users = User::query()
+            ->when($request->string('account')->value() === 'archived', fn ($query) => $query->onlyTrashed())
+            ->with('role')
             ->when(! $request->user()->can('users.view_super_admin'), fn ($query) => $query->whereDoesntHave('role', fn ($query) => $query->where('slug', 'super_admin')))
             ->when($request->string('search')->trim()->value(), fn ($query, string $search) => $query->where(fn ($query) => $query->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%")))
             ->when($request->string('role')->value() && $request->string('role')->value() !== 'all', fn ($query) => $query->whereHas('role', fn ($query) => $query->where('slug', $request->string('role')->value())))
@@ -92,17 +94,29 @@ class UserController extends Controller
         Gate::authorize('users.delete');
         abort_if($request->user()->is($user), 422, 'You cannot delete your own account.');
         abort_if($user->role?->slug === 'super_admin', 422, 'Super Admin accounts cannot be deleted.');
-        if ($user->avatar_path) {
-            Storage::disk('public')->delete($user->avatar_path);
-        }
         $user->delete();
 
-        return response()->json(['message' => 'User deleted successfully.']);
+        return response()->json(['message' => 'User archived successfully.']);
+    }
+
+    public function restore(Request $request, int $user): JsonResponse
+    {
+        Gate::authorize('users.restore');
+
+        $archivedUser = User::query()->onlyTrashed()->with('role')->findOrFail($user);
+        abort_if($archivedUser->role?->slug === 'super_admin' && ! $request->user()->isSuperAdmin(), 404);
+
+        $archivedUser->restore();
+
+        return response()->json([
+            'data' => $this->data($archivedUser),
+            'message' => 'User restored successfully.',
+        ]);
     }
 
     /** @return array<string, mixed> */
     private function data(User $user): array
     {
-        return ['id' => (string) $user->id, 'name' => $user->name, 'email' => $user->email, 'phone' => $user->phone ?? '', 'roleId' => $user->role_id, 'role' => $user->role?->name ?? 'Unassigned', 'roleSlug' => $user->role?->slug, 'status' => $user->status, 'avatar' => $user->avatar_path ? Storage::disk('public')->url($user->avatar_path) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=4f46e5&color=fff', 'lastLogin' => $user->last_login_at?->diffForHumans() ?? 'Never', 'createdAt' => $user->created_at?->toDateString(), 'twoFactorEnabled' => false];
+        return ['id' => (string) $user->id, 'name' => $user->name, 'email' => $user->email, 'phone' => $user->phone ?? '', 'roleId' => $user->role_id, 'role' => $user->role?->name ?? 'Unassigned', 'roleSlug' => $user->role?->slug, 'status' => $user->status, 'archivedAt' => $user->deleted_at?->toIso8601String(), 'avatar' => $user->avatar_path ? Storage::disk('public')->url($user->avatar_path) : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&background=4f46e5&color=fff', 'lastLogin' => $user->last_login_at?->diffForHumans() ?? 'Never', 'createdAt' => $user->created_at?->toDateString(), 'twoFactorEnabled' => false];
     }
 }
