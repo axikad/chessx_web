@@ -2,6 +2,14 @@ import { LucideIcon } from 'lucide-react';
 
 export interface Auth {
     user: User;
+    permissions: string[];
+}
+
+export interface SiteBranding {
+    name: string;
+    slogan: string | null;
+    logo_url: string | null;
+    favicon_url: string | null;
 }
 
 export interface BreadcrumbItem {
@@ -25,6 +33,7 @@ export interface SharedData {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
+    site: SiteBranding;
     [key: string]: unknown;
 }
 
@@ -33,6 +42,7 @@ export interface User {
     name: string;
     email: string;
     avatar?: string;
+    role?: string;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;

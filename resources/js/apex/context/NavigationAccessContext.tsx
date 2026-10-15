@@ -16,7 +16,7 @@ const NavigationAccessContext = createContext<NavigationAccessContextValue>({
 });
 
 export function NavigationAccessProvider({ children, permissions, features }: NavigationAccess & { children: ReactNode }) {
-  const can = (permission?: string) => !permission || !permissions || permissions.includes(permission);
+  const can = (permission?: string) => !permission || !permissions || permissions.includes('*') || permissions.includes(permission);
   const hasFeature = (feature?: string) => !feature || !features || features.includes(feature);
   return <NavigationAccessContext.Provider value={{ can, hasFeature }}>{children}</NavigationAccessContext.Provider>;
 }

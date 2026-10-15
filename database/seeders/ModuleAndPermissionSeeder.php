@@ -19,7 +19,7 @@ class ModuleAndPermissionSeeder extends Seeder
         $superAdmin = User::query()->where('email', 'admin@chessx.test')->firstOrFail();
         $modules = [
             'dashboard' => ['name' => 'Dashboard', 'sort_order' => 10, 'permissions' => ['read']],
-            'users' => ['name' => 'User Management', 'sort_order' => 20, 'permissions' => ['read', 'create', 'update', 'delete']],
+            'users' => ['name' => 'User Management', 'sort_order' => 20, 'permissions' => ['read', 'view_super_admin', 'create', 'update', 'delete']],
             'roles' => ['name' => 'Role Management', 'sort_order' => 30, 'permissions' => ['read', 'create', 'update', 'delete', 'assign_permissions']],
             'permissions' => ['name' => 'Permission Management', 'sort_order' => 40, 'permissions' => ['read', 'create', 'update', 'delete']],
             'modules' => ['name' => 'Module Management', 'sort_order' => 50, 'permissions' => ['read', 'create', 'update', 'delete']],
@@ -58,9 +58,9 @@ class ModuleAndPermissionSeeder extends Seeder
         $userRole = Role::query()->where('slug', 'user')->firstOrFail();
 
         $permissionService->sync($adminRole, Permission::query()->pluck('id'), $superAdmin);
-        $permissionService->sync(
+        $permissionService->assign(
             $userRole,
-            Permission::query()->where('slug', 'dashboard.read')->pluck('id'),
+            Permission::query()->where('slug', 'dashboard.read')->firstOrFail(),
             $superAdmin,
         );
     }

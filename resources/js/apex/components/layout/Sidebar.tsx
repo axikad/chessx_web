@@ -1,9 +1,10 @@
 import { useState, type FC } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { ChevronDown, Sparkles, X } from 'lucide-react';
+import { ChevronDown, X } from 'lucide-react';
 import { navigation, navigationDefaults, type NavigationItem } from '../../config/navigation';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigationAccess } from '../../context/NavigationAccessContext';
+import { useSiteBranding } from '../../context/SiteBrandingContext';
 
 type MenuNodeProps = {
   item: NavigationItem;
@@ -66,6 +67,7 @@ const MenuNode: FC<MenuNodeProps> = ({ item, level, collapsed, expanded, toggle,
 
 export function Sidebar() {
   const { sidebarCollapsed, mobileSidebarOpen, setMobileSidebarOpen } = useTheme();
+  const { site } = useSiteBranding();
   const location = useLocation();
   const { can, hasFeature } = useNavigationAccess();
   const isVisible = (item: NavigationItem) => can(item.permission) && hasFeature(item.feature);
@@ -77,8 +79,8 @@ export function Sidebar() {
     <div className="flex h-full flex-col border-r border-slate-200 bg-white text-slate-700 transition-colors dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
       <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 px-5 dark:border-slate-800">
         <NavLink to="/" className="flex items-center gap-3" onClick={closeMobileMenu}>
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-400 to-violet-600 shadow-lg shadow-indigo-950/30"><span className="h-3.5 w-3.5 rotate-45 rounded-sm bg-white" /></span>
-          {!sidebarCollapsed && <span className="flex flex-col"><span className="text-lg font-bold leading-none tracking-tight text-slate-950 dark:text-white">Apex UI</span><span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-600 dark:text-indigo-300">React + Laravel</span></span>}
+          {site.logo_url ? <img src={site.logo_url} alt={`${site.name} logo`} className="h-8 w-8 rounded-lg object-contain" /> : <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-400 to-violet-600 shadow-lg shadow-indigo-950/30"><span className="h-3.5 w-3.5 rotate-45 rounded-sm bg-white" /></span>}
+          {!sidebarCollapsed && <span className="flex flex-col"><span className="text-lg font-bold leading-none tracking-tight text-slate-950 dark:text-white">{site.name}</span>{site.slogan && <span className="mt-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-indigo-600 dark:text-indigo-300">{site.slogan}</span>}</span>}
         </NavLink>
         <button type="button" onClick={closeMobileMenu} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-950 dark:hover:bg-slate-800 dark:hover:text-white lg:hidden" aria-label="Close menu"><X className="h-5 w-5" /></button>
       </div>
@@ -92,7 +94,6 @@ export function Sidebar() {
           </section>;
         })}
       </nav>
-      {!sidebarCollapsed && <div className="m-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs dark:border-slate-800 dark:bg-slate-900/70"><div className="mb-1 flex items-center gap-2 font-semibold text-slate-800 dark:text-slate-100"><Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-300" /> Template ready</div><p className="mb-3 leading-relaxed text-slate-500 dark:text-slate-400">Navigation, permissions, and modules can be configured for each project.</p><NavLink to="/settings" className="block rounded-lg bg-indigo-600 py-2 text-center text-[11px] font-bold uppercase tracking-wider text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-400">Open settings</NavLink></div>}
     </div>
   );
 
