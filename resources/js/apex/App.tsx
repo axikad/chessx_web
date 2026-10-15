@@ -19,6 +19,7 @@ const RolePermissionPage = page(() => import('./pages/users/RolePermissionPage')
 const PermissionListPage = page(() => import('./pages/users/PermissionListPage'), 'PermissionListPage');
 const BrandingPage = page(() => import('./pages/settings/BrandingPage'), 'BrandingPage');
 const SettingsPage = page(() => import('./pages/settings/SettingsPage'), 'SettingsPage');
+const CompetitionManagementPage = page(() => import('./pages/competition/CompetitionManagementPage'), 'CompetitionManagementPage');
 
 const RouteLoader = () => (
     <div className="grid min-h-[50vh] place-items-center">
@@ -47,6 +48,7 @@ export default function App({ navigationAccess, currentUser, initialSite }: { na
                                     <Route path="permissions" element={<PermissionListPage />} />
                                     <Route path="branding" element={<BrandingPage />} />
                                     <Route path="settings" element={<SettingsPage />} />
+                                    <Route path="competition-management/*" element={<CompetitionManagementPage />} />
                                 </Route>
 
                                 {/* Redirect removed template pages to the dashboard */}

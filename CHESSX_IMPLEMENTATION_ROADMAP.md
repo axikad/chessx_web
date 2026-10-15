@@ -9,6 +9,21 @@ This roadmap guides the gradual integration of the useful Chess Mission features
 - `[x]` Completed and verified
 - `[!]` Blocked or requires a product decision
 
+## Current Progress
+
+Last updated: October 15, 2026
+
+- Overall roadmap: **71 of 210 tracked items completed** and **139 remaining**.
+- Phase 0 - Integration Baseline: **5 of 8 items completed**. Web/mobile scope and automatic Player-role registration decisions remain open; the branch will be pushed again at the next stable checkpoint.
+- Phase 1 - Player Identity Foundation: **29 of 29 items completed** and pushed in commit `d9db8bb`.
+- Phase 2 - Geography and Player Location: **13 backend items completed** and **17 deferred UI/acceptance items remaining**.
+- Current Phase 2 checkpoint: the backend workflow is complete, including India geography options, player location snapshots, database uniqueness protections, GPS resolution, encrypted expiring confirmation tokens, first-location confirmation, cooldown enforcement, administrative review, permissions, history, and audit records.
+- Phase 3 - Competition Foundation: **15 of 15 items completed**.
+- Current Phase 3 checkpoint: competition tiers, regions, seasons, eligibility, configurable ratings, provisional rules, leaderboard snapshots, rollover behavior, permissions, and ChessX Apex administration are complete.
+- Current verification: **148 tests passing with 561 assertions**.
+- Next task: begin Phase 4 by assigning the Player/User role during public registration.
+- Location UI remains planned but intentionally deferred until the backend workflow and permissions are stable.
+
 ## Existing Foundation
 
 - [x] Laravel 12 and Inertia React application
@@ -43,7 +58,7 @@ Goal: establish a safe starting point before importing chess-domain features.
 - [x] Run the production frontend build.
 - [x] Record the current database schema.
 - [ ] Decide whether the first release targets web only or web and mobile.
-- [ ] Define the initial supported geography.
+- [x] Define India as the initial supported geography.
 - [ ] Define whether public registration creates a Player account automatically.
 
 Acceptance criteria:
@@ -95,41 +110,70 @@ Product decisions:
 
 Goal: establish the geographic foundation required for City and State competitions.
 
-- [ ] Create countries, states, and cities tables.
-- [ ] Seed the approved geography dataset.
-- [ ] Create player location records.
-- [ ] Create location-change requests and location history.
-- [ ] Add one-current-location protection per player.
-- [ ] Adapt GPS city resolution from Chess Mission.
-- [ ] Use a signed, expiring location confirmation token.
-- [ ] Do not permanently store raw GPS coordinates.
-- [ ] Add configurable location radius and change cooldown.
-- [ ] Create admin location-review UI.
-- [ ] Add Geography and Location permissions.
-- [ ] Add feature tests for confirmation, cooldown, authorization, and audit history.
+- [x] Create countries, states, and cities tables with models, relationships, factories, and tests.
+- [x] Seed the approved India starter geography dataset (36 states/union territories and 41 city centers).
+- [x] Create player location records.
+- [x] Create location-change requests and location history.
+- [x] Add database-level one-current-location protection per player.
+- [x] Add database-level one-pending-change-request protection per player.
+- [x] Adapt GPS city resolution from Chess Mission.
+- [x] Use an encrypted, tamper-resistant, expiring location confirmation token tied to the player.
+- [x] Do not permanently store raw GPS coordinates.
+- [x] Add configurable location radius and enforce the location-change cooldown.
+- [x] Add Geography and Location permissions.
+- [x] Add feature tests for confirmation, cooldown, authorization, and audit history.
+- [x] Expose authenticated India geography options and player location snapshot data for the deferred UI.
+
+Player-facing ChessX Apex UI:
+
+Delivery decision: complete and verify the backend location workflow first; retain these UI tasks for implementation after the rules and permissions are stable.
+
+- [ ] Add a Location section to the existing Apex Settings page.
+- [ ] Show the player's current city, state, verification method, and verification date.
+- [ ] Add country, state, and city selection controls, limited to the supported India dataset.
+- [ ] Support browser GPS permission, loading, denied, unavailable, and unresolved states.
+- [ ] Show resolved city candidates and require explicit confirmation before saving.
+- [ ] Show pending location-change requests and cooldown availability.
+- [ ] Provide a location-change flow without exposing or permanently storing raw GPS coordinates.
+- [ ] Add responsive empty, success, validation, and failure states using the existing ChessX Apex components.
+
+Administrative ChessX Apex UI:
+
+- [ ] Add Geography and Player Locations navigation only for authorized roles.
+- [ ] Add country, state, and city listing/filtering appropriate to the India-first dataset.
+- [ ] Create an admin location-review page for pending change requests.
+- [ ] Allow authorized administrators to approve or reject requests with an audit reason.
+- [ ] Hide every location action that the logged-in administrator is not permitted to perform.
+
+Phase 2 acceptance criteria:
+
+- [ ] Players can confirm and later request a change to their home city through the ChessX Apex UI.
+- [ ] Administrators can review location requests through the ChessX Apex UI.
+- [ ] Direct backend requests enforce the same permissions as the visible UI actions.
+- [ ] No Laravel Starter Kit page or component is used for geography or player-location features.
 
 ## Phase 3: Competition Foundation
 
 Goal: introduce the City, State, National, and World competition hierarchy.
 
-- [ ] Create competition tiers.
-- [ ] Seed City, State, National, and World tiers.
-- [ ] Create competition regions linked to geography.
-- [ ] Create seasons.
-- [ ] Create player competition eligibility records.
-- [ ] Create player ratings per competition tier.
-- [ ] Create leaderboard snapshot storage.
-- [ ] Make starting rating configurable.
-- [ ] Unlock City League only after location confirmation.
-- [ ] Add Competition, Season, Rating, and Leaderboard permissions.
-- [ ] Add admin management pages and feature tests.
+- [x] Create competition tiers.
+- [x] Seed City, State, National, and World tiers.
+- [x] Create competition regions linked to geography.
+- [x] Create seasons.
+- [x] Create player competition eligibility records.
+- [x] Create player ratings per competition tier.
+- [x] Create leaderboard snapshot storage.
+- [x] Make starting rating configurable.
+- [x] Unlock City League only after location confirmation.
+- [x] Add Competition, Season, Rating, and Leaderboard permissions.
+- [x] Add admin management pages and feature tests.
 
 Product decisions:
 
-- [ ] Confirm the starting Elo rating.
-- [ ] Define provisional-rating rules.
-- [ ] Define season rollover behavior.
-- [ ] Decide whether ratings reset, partially reset, or continue between seasons.
+- [x] Confirm the starting Elo rating at 1200 for every competition tier.
+- [x] Define provisional-rating rules: a tier rating remains provisional through the first 9 rated games and becomes established after game 10.
+- [x] Define season rollover behavior: complete the current season, activate one scheduled season, and idempotently carry standing eligibility into it.
+- [x] Continue ratings and performance statistics unchanged between seasons; seasonal leaderboard snapshots preserve season-specific history.
 
 ## Phase 4: Player Registration and Onboarding
 

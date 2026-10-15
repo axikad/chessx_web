@@ -7,6 +7,7 @@ use Carbon\CarbonInterface;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -74,6 +75,48 @@ class User extends Authenticatable
     public function profile(): HasOne
     {
         return $this->hasOne(UserProfile::class);
+    }
+
+    /** @return HasMany<UserLocation, $this> */
+    public function locations(): HasMany
+    {
+        return $this->hasMany(UserLocation::class);
+    }
+
+    /** @return HasOne<UserLocation, $this> */
+    public function currentLocation(): HasOne
+    {
+        return $this->hasOne(UserLocation::class)->where('is_current', true);
+    }
+
+    /** @return HasMany<LocationChangeRequest, $this> */
+    public function locationChangeRequests(): HasMany
+    {
+        return $this->hasMany(LocationChangeRequest::class);
+    }
+
+    /** @return HasMany<LocationChangeHistory, $this> */
+    public function locationChangeHistory(): HasMany
+    {
+        return $this->hasMany(LocationChangeHistory::class);
+    }
+
+    /** @return HasMany<PlayerCompetition, $this> */
+    public function playerCompetitions(): HasMany
+    {
+        return $this->hasMany(PlayerCompetition::class);
+    }
+
+    /** @return HasMany<PlayerRating, $this> */
+    public function playerRatings(): HasMany
+    {
+        return $this->hasMany(PlayerRating::class);
+    }
+
+    /** @return HasMany<LeaderboardSnapshot, $this> */
+    public function leaderboardSnapshots(): HasMany
+    {
+        return $this->hasMany(LeaderboardSnapshot::class);
     }
 
     protected static function booted(): void

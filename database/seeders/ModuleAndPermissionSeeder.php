@@ -25,6 +25,12 @@ class ModuleAndPermissionSeeder extends Seeder
             'modules' => ['name' => 'Module Management', 'sort_order' => 50, 'permissions' => ['read', 'create', 'update', 'delete']],
             'branding' => ['name' => 'Site Branding', 'sort_order' => 60, 'permissions' => ['read', 'update']],
             'player_profiles' => ['name' => 'Player Profiles', 'sort_order' => 70, 'permissions' => ['read', 'update']],
+            'geography' => ['name' => 'Geography', 'sort_order' => 80, 'permissions' => ['read', 'create', 'update', 'delete']],
+            'player_locations' => ['name' => 'Player Locations', 'sort_order' => 90, 'permissions' => ['read', 'review']],
+            'competitions' => ['name' => 'Competitions', 'sort_order' => 100, 'permissions' => ['read', 'create', 'update', 'delete']],
+            'seasons' => ['name' => 'Seasons', 'sort_order' => 110, 'permissions' => ['read', 'create', 'update', 'delete']],
+            'ratings' => ['name' => 'Player Ratings', 'sort_order' => 120, 'permissions' => ['read', 'update']],
+            'leaderboards' => ['name' => 'Leaderboards', 'sort_order' => 130, 'permissions' => ['read', 'generate']],
         ];
 
         foreach ($modules as $moduleSlug => $moduleData) {

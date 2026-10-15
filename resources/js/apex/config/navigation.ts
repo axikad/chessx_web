@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { ChevronRight, KeyRound, LayoutDashboard, Palette, ShieldCheck, UsersRound } from 'lucide-react';
+import { BarChart3, CalendarRange, ChevronRight, KeyRound, LayoutDashboard, ListOrdered, Palette, ShieldCheck, Trophy, UsersRound } from 'lucide-react';
 
 export type NavigationItem = {
     id: string;
@@ -62,6 +62,17 @@ export const navigation: NavigationSection[] = [
                 icon: Palette,
                 permission: 'branding.read',
                 href: '/branding',
+            },
+            {
+                id: 'competition-management',
+                title: 'Competitions',
+                icon: Trophy,
+                children: [
+                    { id: 'competition-tiers', title: 'Structure', icon: Trophy, permission: 'competitions.read', href: '/competition-management/competitions' },
+                    { id: 'competition-seasons', title: 'Seasons', icon: CalendarRange, permission: 'seasons.read', href: '/competition-management/seasons' },
+                    { id: 'competition-ratings', title: 'Player Ratings', icon: BarChart3, permission: 'ratings.read', href: '/competition-management/ratings' },
+                    { id: 'competition-leaderboards', title: 'Leaderboards', icon: ListOrdered, permission: 'leaderboards.read', href: '/competition-management/leaderboards' },
+                ],
             },
         ],
     },

@@ -14,6 +14,9 @@ class DatabaseSeeder extends Seeder
         $this->call(RoleAndUserSeeder::class);
         $this->call(UserProfileSeeder::class);
         $this->call(ModuleAndPermissionSeeder::class);
+        $this->call(GeographySeeder::class);
+        $this->call(CompetitionTierSeeder::class);
+        $this->call(CompetitionRegionSeeder::class);
         $this->call(SiteSettingSeeder::class);
     }
 }
