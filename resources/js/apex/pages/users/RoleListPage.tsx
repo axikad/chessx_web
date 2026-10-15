@@ -1,5 +1,6 @@
 import { Edit2, KeyRound, Plus, Shield, Trash2 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
@@ -10,26 +11,24 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { useNavigationAccess } from '../../context/NavigationAccessContext';
 import { useToast } from '../../context/ToastContext';
 import { roleService } from '../../services/managementService';
-import { PermissionModuleRecord, Role } from '../../types';
+import { Role } from '../../types';
 
 const emptyRole = { name: '', slug: '', description: '' };
 
 export const RoleListPage: React.FC = () => {
     const { toast, showToast } = useToast();
+    const navigate = useNavigate();
     const { can } = useNavigationAccess();
     const canCreateRoles = can('roles.create');
     const canUpdateRoles = can('roles.update');
     const canDeleteRoles = can('roles.delete');
     const canAssignPermissions = can('roles.assign_permissions');
     const [roles, setRoles] = useState<Role[]>([]);
-    const [modules, setModules] = useState<PermissionModuleRecord[]>([]);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [editingRole, setEditingRole] = useState<Role | null>(null);
     const [roleForm, setRoleForm] = useState(emptyRole);
     const [roleModalOpen, setRoleModalOpen] = useState(false);
-    const [permissionRole, setPermissionRole] = useState<Role | null>(null);
-    const [permissionIds, setPermissionIds] = useState<number[]>([]);
     const [deleteRole, setDeleteRole] = useState<Role | null>(null);
 
     const loadRoles = useCallback(async () => {
@@ -37,7 +36,6 @@ export const RoleListPage: React.FC = () => {
         try {
             const response = await roleService.list();
             setRoles(response.data);
-            setModules(response.modules);
         } catch {
             showToast('error', 'Failed to load roles');
         } finally {
@@ -66,26 +64,6 @@ export const RoleListPage: React.FC = () => {
             toast.success(`Role ${editingRole ? 'updated' : 'created'} successfully`);
         } catch (error) {
             toast.error(error instanceof Error ? error.message : 'Could not save role');
-        } finally {
-            setSaving(false);
-        }
-    };
-
-    const openPermissions = (role: Role) => {
-        setPermissionRole(role);
-        setPermissionIds(role.permissionIds);
-    };
-
-    const savePermissions = async () => {
-        if (!permissionRole) return;
-        setSaving(true);
-        try {
-            await roleService.syncPermissions(permissionRole.id, permissionIds);
-            setPermissionRole(null);
-            await loadRoles();
-            toast.success('Role permissions updated');
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : 'Could not update permissions');
         } finally {
             setSaving(false);
         }
@@ -150,7 +128,7 @@ export const RoleListPage: React.FC = () => {
                 <div className="flex justify-end gap-1" onClick={(event) => event.stopPropagation()}>
                     {canAssignPermissions && !role.isSystem && (
                         <button
-                            onClick={() => openPermissions(role)}
+                            onClick={() => navigate(`/role-permissions?role=${role.id}`)}
                             className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-indigo-600 dark:hover:bg-slate-800"
                             title="Assign permissions"
                         >
@@ -232,57 +210,6 @@ export const RoleListPage: React.FC = () => {
                 </form>
             </Modal>}
 
-            {canAssignPermissions && <Modal
-                isOpen={Boolean(permissionRole)}
-                onClose={() => setPermissionRole(null)}
-                title={`Permissions for ${permissionRole?.name ?? ''}`}
-                description={permissionRole?.isSystem ? 'Super Admin always has full access.' : 'Select the exact permissions assigned to this role.'}
-                size="xl"
-            >
-                <div className="space-y-4">
-                    {modules.map((module) => (
-                        <div key={module.id} className="rounded-xl border border-slate-200 dark:border-slate-800">
-                            <div className="border-b border-slate-100 bg-slate-50/60 px-4 py-3 font-semibold dark:border-slate-800 dark:bg-slate-800/40">
-                                {module.name}
-                            </div>
-                            <div className="grid gap-2 p-4 sm:grid-cols-2">
-                                {module.permissions.map((permission) => (
-                                    <label
-                                        key={permission.id}
-                                        className="flex items-center gap-3 rounded-lg border border-slate-200 p-3 text-xs dark:border-slate-800"
-                                    >
-                                        <input
-                                            type="checkbox"
-                                            checked={permissionRole?.isSystem || permissionIds.includes(permission.id)}
-                                            disabled={permissionRole?.isSystem}
-                                            onChange={(event) =>
-                                                setPermissionIds((current) =>
-                                                    event.target.checked ? [...current, permission.id] : current.filter((id) => id !== permission.id),
-                                                )
-                                            }
-                                            className="h-4 w-4 rounded text-indigo-600"
-                                        />
-                                        <span>
-                                            <span className="block font-semibold">{permission.name}</span>
-                                            <span className="font-mono text-[10px] text-slate-400">{permission.slug}</span>
-                                        </span>
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
-                    {!permissionRole?.isSystem && (
-                        <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={() => setPermissionRole(null)}>
-                                Cancel
-                            </Button>
-                            <Button onClick={savePermissions} isLoading={saving}>
-                                Save Permissions
-                            </Button>
-                        </div>
-                    )}
-                </div>
-            </Modal>}
             {canDeleteRoles && <ConfirmDialog
                 isOpen={Boolean(deleteRole)}
                 onClose={() => setDeleteRole(null)}

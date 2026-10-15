@@ -15,6 +15,7 @@ const page = <T extends Record<string, unknown>>(loader: () => Promise<T>, name:
 const OverviewDashboard = page(() => import('./pages/dashboard/OverviewDashboard'), 'OverviewDashboard');
 const UserListPage = page(() => import('./pages/users/UserListPage'), 'UserListPage');
 const RoleListPage = page(() => import('./pages/users/RoleListPage'), 'RoleListPage');
+const RolePermissionPage = page(() => import('./pages/users/RolePermissionPage'), 'RolePermissionPage');
 const PermissionListPage = page(() => import('./pages/users/PermissionListPage'), 'PermissionListPage');
 const BrandingPage = page(() => import('./pages/settings/BrandingPage'), 'BrandingPage');
 
@@ -41,6 +42,7 @@ export default function App({ navigationAccess, currentUser, initialSite }: { na
                                     {/* User Management */}
                                     <Route path="users" element={<UserListPage />} />
                                     <Route path="roles" element={<RoleListPage />} />
+                                    <Route path="role-permissions" element={<RolePermissionPage />} />
                                     <Route path="permissions" element={<PermissionListPage />} />
                                     <Route path="branding" element={<BrandingPage />} />
                                 </Route>

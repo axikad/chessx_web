@@ -30,6 +30,26 @@ test('roles assigned to users cannot be deleted', function () {
     $this->actingAs($actor)->deleteJson(route('management.roles.destroy', $role))->assertUnprocessable();
 });
 
+test('an instant permission update can revoke an assigned permission', function () {
+    $actor = User::factory()->for(Role::factory()->superAdmin())->create();
+    $role = Role::factory()->create();
+    $permission = Permission::factory()->create();
+    app(RolePermissionService::class)->assign($role, $permission, $actor);
+
+    $response = $this->actingAs($actor)->putJson(route('management.roles.permissions.update', $role), [
+        'permission_ids' => [],
+    ]);
+
+    $response->assertOk()->assertJsonPath('data.permissionIds', []);
+    $this->assertDatabaseMissing('permission_role', ['role_id' => $role->id, 'permission_id' => $permission->id]);
+    $this->assertDatabaseHas('permission_assignment_logs', [
+        'role_id' => $role->id,
+        'permission_id' => $permission->id,
+        'performed_by' => $actor->id,
+        'action' => 'revoked',
+    ]);
+});
+
 test('read-only role permission does not allow role changes or permission assignment', function () {
     $role = Role::factory()->create();
     $actor = User::factory()->for($role)->create();

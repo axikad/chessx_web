@@ -1,5 +1,6 @@
-import { Edit2, KeyRound, Plus, Trash2 } from 'lucide-react';
+import { Edit2, KeyRound, Plus, ShieldCheck, Trash2 } from 'lucide-react';
 import React, { useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
@@ -17,10 +18,12 @@ const emptyPermission = { module_id: '', name: '', slug: '', action: 'read', des
 
 export const PermissionListPage: React.FC = () => {
     const { toast, showToast } = useToast();
+    const navigate = useNavigate();
     const { can } = useNavigationAccess();
     const canCreatePermissions = can('permissions.create');
     const canUpdatePermissions = can('permissions.update');
     const canDeletePermissions = can('permissions.delete');
+    const canAssignRolePermissions = can('roles.read') && can('roles.assign_permissions');
     const [permissions, setPermissions] = useState<PermissionRecord[]>([]);
     const [modules, setModules] = useState<{ id: number; name: string }[]>([]);
     const [loading, setLoading] = useState(true);
@@ -91,10 +94,7 @@ export const PermissionListPage: React.FC = () => {
     };
 
     const columns: Column<PermissionRecord>[] = [
-    ];
-
-    if (canUpdatePermissions || canDeletePermissions) {
-        columns.push({
+        {
             key: 'name',
             header: 'Permission',
             sortable: true,
@@ -122,7 +122,10 @@ export const PermissionListPage: React.FC = () => {
                 </Badge>
             ),
         },
-        {
+    ];
+
+    if (canUpdatePermissions || canDeletePermissions) {
+        columns.push({
             key: 'actions',
             header: 'Actions',
             align: 'right',
@@ -151,11 +154,10 @@ export const PermissionListPage: React.FC = () => {
                 title="Permission Management"
                 subtitle="Manage the individual abilities that can be assigned to roles."
                 breadcrumbs={[{ label: 'Permissions' }]}
-                actions={canCreatePermissions ? (
-                    <Button size="sm" onClick={() => openModal()} leftIcon={<Plus className="h-3.5 w-3.5" />}>
-                        Create Permission
-                    </Button>
-                ) : undefined}
+                actions={(canCreatePermissions || canAssignRolePermissions) ? <>
+                    {canAssignRolePermissions && <Button size="sm" variant="outline" onClick={() => navigate('/role-permissions')} leftIcon={<ShieldCheck className="h-3.5 w-3.5" />}>Assign Role Permissions</Button>}
+                    {canCreatePermissions && <Button size="sm" onClick={() => openModal()} leftIcon={<Plus className="h-3.5 w-3.5" />}>Create Permission</Button>}
+                </> : undefined}
             />
             <DataTable
                 title="Permissions"
