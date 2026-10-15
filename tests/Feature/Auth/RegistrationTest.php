@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Role;
+
 test('registration screen can be rendered', function () {
     $response = $this->get('/register');
 
@@ -7,6 +9,8 @@ test('registration screen can be rendered', function () {
 });
 
 test('new users can register', function () {
+    Role::factory()->user()->create();
+
     $response = $this->post('/register', [
         'name' => 'Test User',
         'email' => 'test@example.com',
@@ -16,4 +20,5 @@ test('new users can register', function () {
 
     $this->assertAuthenticated();
     $response->assertRedirect(route('dashboard', absolute: false));
+    expect(auth()->user()?->role?->slug)->toBe('user');
 });
