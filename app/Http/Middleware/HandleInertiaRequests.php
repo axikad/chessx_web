@@ -72,6 +72,9 @@ class HandleInertiaRequests extends Middleware
             'site' => Schema::hasTable('site_settings')
                 ? SiteSetting::current()->toBranding()
                 : ['name' => 'Chess Mission', 'slogan' => 'React + Laravel', 'logo_url' => null, 'favicon_url' => null],
+            'flash' => [
+                'success' => fn (): ?string => $request->session()->get('success'),
+            ],
         ]);
     }
 }

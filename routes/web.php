@@ -12,6 +12,7 @@ use App\Http\Controllers\PlayerProfileController;
 use App\Http\Controllers\PlayerRatingController;
 use App\Http\Controllers\PromotionRecordController;
 use App\Http\Controllers\PromotionRuleController;
+use App\Http\Controllers\PublicContactController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SeasonController;
 use App\Http\Controllers\SiteSettingController;
@@ -19,11 +20,31 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('welcome');
-    })->name('home');
+Route::get('/', function () {
+    return Inertia::render('public/home');
+})->name('home');
 
+Route::get('privacy-policy', function () {
+    return Inertia::render('public/privacy-policy');
+})->name('privacy-policy');
+
+Route::get('terms', function () {
+    return Inertia::render('public/terms');
+})->name('terms');
+
+Route::get('contact', function () {
+    return Inertia::render('public/contact');
+})->name('contact');
+
+Route::post('contact', PublicContactController::class)
+    ->middleware('throttle:5,1')
+    ->name('contact.store');
+
+Route::get('account-deletion', function () {
+    return Inertia::render('public/account-deletion');
+})->name('account-deletion');
+
+Route::middleware(['auth'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('welcome');
     })->name('dashboard');

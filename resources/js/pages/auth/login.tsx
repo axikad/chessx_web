@@ -271,7 +271,7 @@ export default function Login({ status, canResetPassword, googleClientId, appleA
     }, [appleAuthorization]);
 
     return (
-        <AdminAuthLayout title="Sign in to dashboard" description="Secure administration for your Laravel application">
+        <AdminAuthLayout title="Sign in to your account" description="Continue your Chess Mission journey">
             <Head title="Log in" />
             <form className="space-y-4" onSubmit={submit}>
                 <div className="space-y-1.5">
@@ -389,6 +389,17 @@ export default function Login({ status, canResetPassword, googleClientId, appleA
                     Need an account?{' '}
                     <Link href={route('register')} className="font-bold text-indigo-600 hover:underline dark:text-indigo-400">
                         Create one
+                    </Link>
+                </p>
+                <p className="text-center text-[11px] text-slate-400">
+                    <Link href={route('privacy-policy')} className="hover:text-indigo-600 hover:underline">
+                        Privacy
+                    </Link>
+                    <span className="px-2" aria-hidden="true">
+                        •
+                    </span>
+                    <Link href={route('terms')} className="hover:text-indigo-600 hover:underline">
+                        Terms
                     </Link>
                 </p>
             </form>
