@@ -13,7 +13,8 @@
 /bootstrap/ssr
 /node_modules
 /public/hot
-/public/build
+# Keep production Vite assets in Git because the shared hosting server does not
+# provide Node.js/npm. Rebuild and commit this directory after frontend changes.
 /public/storage
 /storage/*.key
 /storage/pail

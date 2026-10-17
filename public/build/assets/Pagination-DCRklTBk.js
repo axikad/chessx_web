@@ -1,0 +1,11 @@
+import{c as n}from"./createLucideIcon-DV6sj6LC.js";import{j as a}from"./app-BNPXgK6j.js";import{C as h}from"./DataTable-BSAhHATQ.js";import{z as m}from"./welcome-BCpdhhSh.js";/**
+ * @license lucide-react v0.475.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const x=[["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}],["path",{d:"m15 9-6 6",key:"1uzhvr"}],["path",{d:"m9 9 6 6",key:"z0biqf"}]],j=n("CircleX",x);/**
+ * @license lucide-react v0.475.0 - ISC
+ *
+ * This source code is licensed under the ISC license.
+ * See the LICENSE file in the root directory of this source tree.
+ */const u=[["circle",{cx:"12",cy:"12",r:"1",key:"41hilf"}],["circle",{cx:"19",cy:"12",r:"1",key:"1wjl8i"}],["circle",{cx:"5",cy:"12",r:"1",key:"1pcz8c"}]],b=n("Ellipsis",u),p=(t,r,l)=>{if(r<=7+l*2)return Array.from({length:r},(e,s)=>s+1);const i=new Set([1,r]);for(let e=Math.max(2,t-l);e<=Math.min(r-1,t+l);e+=1)i.add(e);const o=[...i].sort((e,s)=>e-s),c=[];return o.forEach((e,s)=>{s&&e-o[s-1]>1&&c.push("ellipsis"),c.push(e)}),c};function N({page:t,totalPages:r,onChange:l,siblingCount:i=1,className:o=""}){if(r<=1)return null;const c=p(t,r,i),e="grid h-9 min-w-9 place-items-center rounded-lg px-2 text-sm font-medium transition-colors";return a.jsxs("nav",{"aria-label":"Pagination",className:`flex items-center gap-1 ${o}`,children:[a.jsx("button",{type:"button","aria-label":"Previous page",disabled:t===1,onClick:()=>l(t-1),className:`${e} text-slate-500 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-400 dark:hover:bg-slate-800`,children:a.jsx(h,{className:"h-4 w-4"})}),c.map((s,d)=>s==="ellipsis"?a.jsx("span",{className:`${e} text-slate-400`,children:a.jsx(b,{className:"h-4 w-4"})},`ellipsis-${d}`):a.jsx("button",{type:"button","aria-current":s===t?"page":void 0,onClick:()=>l(s),className:`${e} ${s===t?"bg-indigo-600 text-white shadow-sm":"text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"}`,children:s},s)),a.jsx("button",{type:"button","aria-label":"Next page",disabled:t===r,onClick:()=>l(t+1),className:`${e} text-slate-500 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-slate-400 dark:hover:bg-slate-800`,children:a.jsx(m,{className:"h-4 w-4"})})]})}export{j as C,N as P};
