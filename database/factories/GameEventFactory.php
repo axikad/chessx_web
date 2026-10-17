@@ -20,6 +20,8 @@ class GameEventFactory extends Factory
     {
         return [
             'game_id' => Game::factory(),
+            'actor_user_id' => null,
+            'sequence_number' => 1,
             'event_type' => 'game_created',
             'payload_json' => ['source' => 'matchmaking'],
         ];

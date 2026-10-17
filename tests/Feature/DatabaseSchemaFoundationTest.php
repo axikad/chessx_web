@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\GameMode;
 use App\Models\AdEvent;
 use App\Models\AntiCheatFlag;
 use App\Models\CompetitionTier;
@@ -60,7 +61,11 @@ it('persists the complete authoritative game aggregate', function () {
     ]);
     $state = GameState::factory()->create(['game_id' => $game->id]);
     $move = GameMove::factory()->create(['game_id' => $game->id, 'user_id' => $whitePlayer->id]);
-    $event = GameEvent::factory()->create(['game_id' => $game->id]);
+    $event = GameEvent::factory()->create([
+        'game_id' => $game->id,
+        'actor_user_id' => $whitePlayer->id,
+        'sequence_number' => 1,
+    ]);
     $dispute = GameDispute::factory()->create(['game_id' => $game->id, 'reporting_user_id' => $whitePlayer->id]);
     $rating = RatingHistory::factory()->create([
         'game_id' => $game->id,
@@ -74,26 +79,55 @@ it('persists the complete authoritative game aggregate', function () {
         ->and($game->disputes->first()->is($dispute))->toBeTrue()
         ->and($game->ratingHistories->first()->is($rating))->toBeTrue()
         ->and($state->white_time_ms)->toBeInt()
+        ->and($state->fullmove_number)->toBe(4)
+        ->and(Schema::hasColumn('game_states', 'move_number'))->toBeFalse()
+        ->and($move->piece_color)->toBe('white')
+        ->and($move->piece_type)->toBe('pawn')
+        ->and($move->from_square)->toBe('e2')
+        ->and($move->to_square)->toBe('e4')
+        ->and($move->captured_piece_type)->toBeNull()
+        ->and($move->promotion_piece)->toBeNull()
+        ->and($move->is_capture)->toBeFalse()
+        ->and($move->is_castling)->toBeFalse()
+        ->and($move->is_en_passant)->toBeFalse()
+        ->and($move->uci_move)->toBe('e2e4')
+        ->and($move->san_move)->toBe('e4')
+        ->and($event->actor->is($whitePlayer))->toBeTrue()
+        ->and($event->sequence_number)->toBe(1)
         ->and($event->payload_json)->toBeArray();
 });
 
-it('rejects duplicate game state move ply and rating result records', function () {
+it('rejects duplicate game state move ply event sequence and rating result records', function () {
     $tier = CompetitionTier::factory()->create();
     $user = User::factory()->create();
     $game = Game::factory()->create(['tier_id' => $tier->id]);
     GameState::factory()->create(['game_id' => $game->id]);
     GameMove::factory()->create(['game_id' => $game->id, 'user_id' => $user->id, 'ply' => 1]);
+    GameEvent::factory()->create(['game_id' => $game->id, 'sequence_number' => 1]);
     RatingHistory::factory()->create(['game_id' => $game->id, 'tier_id' => $tier->id, 'user_id' => $user->id]);
 
     expect(fn () => GameState::factory()->create(['game_id' => $game->id]))->toThrow(QueryException::class)
         ->and(fn () => GameMove::factory()->create(['game_id' => $game->id, 'user_id' => $user->id, 'ply' => 1]))->toThrow(QueryException::class)
+        ->and(fn () => GameEvent::factory()->create(['game_id' => $game->id, 'sequence_number' => 1]))->toThrow(QueryException::class)
         ->and(fn () => RatingHistory::factory()->create(['game_id' => $game->id, 'tier_id' => $tier->id, 'user_id' => $user->id]))->toThrow(QueryException::class);
 });
 
 it('allows only one queued matchmaking record per player', function () {
     $tier = CompetitionTier::factory()->create();
     $user = User::factory()->create();
-    $entry = MatchmakingQueue::factory()->create(['tier_id' => $tier->id, 'user_id' => $user->id]);
+    $entry = MatchmakingQueue::factory()->create([
+        'tier_id' => $tier->id,
+        'user_id' => $user->id,
+        'game_mode' => 'casual',
+        'time_control_seconds' => 300,
+        'increment_seconds' => 3,
+        'rating_tolerance' => 150,
+    ]);
+
+    expect($entry->game_mode)->toBe(GameMode::Casual)
+        ->and($entry->time_control_seconds)->toBe(300)
+        ->and($entry->increment_seconds)->toBe(3)
+        ->and($entry->rating_tolerance)->toBe(150);
 
     expect(fn () => MatchmakingQueue::factory()->create(['tier_id' => $tier->id, 'user_id' => $user->id]))
         ->toThrow(QueryException::class);

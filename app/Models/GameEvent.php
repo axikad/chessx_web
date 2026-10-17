@@ -15,17 +15,23 @@ class GameEvent extends Model
     public const UPDATED_AT = null;
 
     /** @var list<string> */
-    protected $fillable = ['game_id', 'event_type', 'payload_json'];
+    protected $fillable = ['game_id', 'actor_user_id', 'sequence_number', 'event_type', 'payload_json'];
 
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['payload_json' => 'array'];
+        return ['sequence_number' => 'integer', 'payload_json' => 'array'];
     }
 
     /** @return BelongsTo<Game, $this> */
     public function game(): BelongsTo
     {
         return $this->belongsTo(Game::class);
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function actor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'actor_user_id');
     }
 }

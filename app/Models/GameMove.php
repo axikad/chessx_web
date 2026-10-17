@@ -15,12 +15,35 @@ class GameMove extends Model
     public const UPDATED_AT = null;
 
     /** @var list<string> */
-    protected $fillable = ['game_id', 'ply', 'user_id', 'uci_move', 'san_move', 'fen_after', 'clock_remaining_ms'];
+    protected $fillable = [
+        'game_id',
+        'ply',
+        'user_id',
+        'piece_color',
+        'piece_type',
+        'from_square',
+        'to_square',
+        'captured_piece_type',
+        'promotion_piece',
+        'is_capture',
+        'is_castling',
+        'is_en_passant',
+        'uci_move',
+        'san_move',
+        'fen_after',
+        'clock_remaining_ms',
+    ];
 
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['ply' => 'integer', 'clock_remaining_ms' => 'integer'];
+        return [
+            'ply' => 'integer',
+            'is_capture' => 'boolean',
+            'is_castling' => 'boolean',
+            'is_en_passant' => 'boolean',
+            'clock_remaining_ms' => 'integer',
+        ];
     }
 
     /** @return BelongsTo<Game, $this> */

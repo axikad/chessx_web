@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\GameMode;
 use App\Enums\MatchmakingQueueStatus;
 use Database\Factories\MatchmakingQueueFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,12 +17,12 @@ class MatchmakingQueue extends Model
     protected $table = 'matchmaking_queue';
 
     /** @var list<string> */
-    protected $fillable = ['user_id', 'tier_id', 'region_id', 'rating', 'rating_range', 'status', 'queued_at', 'expires_at', 'matched_game_id'];
+    protected $fillable = ['user_id', 'tier_id', 'region_id', 'game_mode', 'time_control_seconds', 'increment_seconds', 'rating', 'rating_tolerance', 'status', 'queued_at', 'expires_at', 'matched_game_id'];
 
     /** @return array<string, string> */
     protected function casts(): array
     {
-        return ['rating' => 'integer', 'rating_range' => 'integer', 'status' => MatchmakingQueueStatus::class, 'queued_at' => 'datetime', 'expires_at' => 'datetime'];
+        return ['game_mode' => GameMode::class, 'time_control_seconds' => 'integer', 'increment_seconds' => 'integer', 'rating' => 'integer', 'rating_tolerance' => 'integer', 'status' => MatchmakingQueueStatus::class, 'queued_at' => 'datetime', 'expires_at' => 'datetime'];
     }
 
     /** @return BelongsTo<User, $this> */
