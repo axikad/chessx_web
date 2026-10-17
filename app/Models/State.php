@@ -14,7 +14,7 @@ class State extends Model
     use HasFactory;
 
     /** @var list<string> */
-    protected $fillable = ['country_id', 'name', 'code', 'status'];
+    protected $fillable = ['geonames_id', 'country_id', 'name', 'code', 'geonames_code', 'status'];
 
     /** @return BelongsTo<Country, $this> */
     public function country(): BelongsTo

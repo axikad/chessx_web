@@ -14,10 +14,10 @@ class CompetitionTierSeeder extends Seeder
     public function run(): void
     {
         $tiers = [
-            ['code' => CompetitionTierCode::City, 'name' => 'City League', 'scope_type' => 'city', 'sequence_number' => 1],
-            ['code' => CompetitionTierCode::State, 'name' => 'State League', 'scope_type' => 'state', 'sequence_number' => 2],
-            ['code' => CompetitionTierCode::National, 'name' => 'National League', 'scope_type' => 'country', 'sequence_number' => 3],
-            ['code' => CompetitionTierCode::World, 'name' => 'World League', 'scope_type' => 'global', 'sequence_number' => 4],
+            ['code' => CompetitionTierCode::City, 'name' => 'City League', 'artwork_path' => 'leagues/Lcity.png', 'scope_type' => 'city', 'sequence_number' => 1],
+            ['code' => CompetitionTierCode::State, 'name' => 'State League', 'artwork_path' => 'leagues/Lstate.png', 'scope_type' => 'state', 'sequence_number' => 2],
+            ['code' => CompetitionTierCode::National, 'name' => 'National League', 'artwork_path' => 'leagues/Lnational.png', 'scope_type' => 'country', 'sequence_number' => 3],
+            ['code' => CompetitionTierCode::World, 'name' => 'World League', 'artwork_path' => 'leagues/Lworld.png', 'scope_type' => 'global', 'sequence_number' => 4],
         ];
 
         foreach ($tiers as $tier) {

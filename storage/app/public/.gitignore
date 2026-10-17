@@ -1,2 +1,4 @@
 *
 !.gitignore
+!leagues/
+!leagues/*.png

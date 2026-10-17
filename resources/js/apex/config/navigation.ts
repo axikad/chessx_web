@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
-import { BarChart3, CalendarRange, ChevronRight, KeyRound, LayoutDashboard, ListOrdered, Palette, ShieldCheck, Trophy, UsersRound } from 'lucide-react';
+import { ArrowUpCircle, BarChart3, CalendarRange, ChevronRight, ClipboardCheck, KeyRound, LayoutDashboard, ListOrdered, MapPinned, Palette, ShieldCheck, Trophy, UsersRound } from 'lucide-react';
 
 export type NavigationItem = {
     id: string;
@@ -72,6 +72,16 @@ export const navigation: NavigationSection[] = [
                     { id: 'competition-seasons', title: 'Seasons', icon: CalendarRange, permission: 'seasons.read', href: '/competition-management/seasons' },
                     { id: 'competition-ratings', title: 'Player Ratings', icon: BarChart3, permission: 'ratings.read', href: '/competition-management/ratings' },
                     { id: 'competition-leaderboards', title: 'Leaderboards', icon: ListOrdered, permission: 'leaderboards.read', href: '/competition-management/leaderboards' },
+                    { id: 'competition-promotions', title: 'Promotions', icon: ArrowUpCircle, permission: 'promotions.read', href: '/promotion-management/rules' },
+                ],
+            },
+            {
+                id: 'location-management',
+                title: 'Locations',
+                icon: MapPinned,
+                children: [
+                    { id: 'geography-management', title: 'Geography', icon: MapPinned, permission: 'geography.read', href: '/location-management/geography' },
+                    { id: 'location-reviews', title: 'Change Requests', icon: ClipboardCheck, permission: 'player_locations.read', href: '/location-management/reviews' },
                 ],
             },
         ],

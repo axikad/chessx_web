@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\Auth\AppleAuthenticatedSessionController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
+use App\Http\Controllers\Auth\GoogleAuthenticatedSessionController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -20,6 +22,14 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    Route::post('auth/google', GoogleAuthenticatedSessionController::class)
+        ->middleware('throttle:6,1')
+        ->name('google.login');
+
+    Route::post('auth/apple', AppleAuthenticatedSessionController::class)
+        ->middleware('throttle:6,1')
+        ->name('apple.login');
 
     Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
         ->name('password.request');

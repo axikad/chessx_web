@@ -71,7 +71,13 @@ export function Sidebar() {
   const location = useLocation();
   const { can, hasFeature } = useNavigationAccess();
   const isVisible = (item: NavigationItem) => can(item.permission) && hasFeature(item.feature);
-  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>(() => ({ dashboards: true, 'e-commerce': location.pathname.startsWith('/ecommerce'), users: location.pathname.startsWith('/users') }));
+  const [expandedMenus, setExpandedMenus] = useState<Record<string, boolean>>(() => ({
+    dashboards: true,
+    'e-commerce': location.pathname.startsWith('/ecommerce'),
+    users: location.pathname.startsWith('/users'),
+    'competition-management': location.pathname.startsWith('/competition-management'),
+    'location-management': location.pathname.startsWith('/location-management'),
+  }));
   const toggleMenu = (id: string) => setExpandedMenus((current) => ({ ...current, [id]: !current[id] }));
   const closeMobileMenu = () => setMobileSidebarOpen(false);
 
@@ -86,7 +92,9 @@ export function Sidebar() {
       </div>
       <nav aria-label="Primary navigation" className="flex-1 overflow-y-auto px-3 py-4">
         {navigation.map((section) => {
-          const items = section.items.filter(isVisible);
+          const items = section.items.filter((item) =>
+            isVisible(item) && (!item.children || item.children.some(isVisible))
+          );
           if (!items.length) return null;
           return <section key={section.id} className="mb-5">
             {!sidebarCollapsed && <h2 className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">{section.label}</h2>}

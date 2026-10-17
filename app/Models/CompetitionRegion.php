@@ -48,6 +48,24 @@ class CompetitionRegion extends Model
         return $this->hasMany(LeaderboardSnapshot::class, 'region_id');
     }
 
+    /** @return HasMany<Game, $this> */
+    public function games(): HasMany
+    {
+        return $this->hasMany(Game::class, 'region_id');
+    }
+
+    /** @return HasMany<MatchmakingQueue, $this> */
+    public function matchmakingEntries(): HasMany
+    {
+        return $this->hasMany(MatchmakingQueue::class, 'region_id');
+    }
+
+    /** @return HasMany<Tournament, $this> */
+    public function tournaments(): HasMany
+    {
+        return $this->hasMany(Tournament::class, 'region_id');
+    }
+
     protected static function booted(): void
     {
         static::saving(function (CompetitionRegion $region): void {

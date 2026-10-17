@@ -1,0 +1,16 @@
+---
+description: Keep ChessX development fast by using focused verification during incremental work
+alwaysApply: true
+---
+
+# Fast Verification Workflow
+
+- Every behavior change still needs a relevant automated test, but run only the narrowest affected test file or test filter while developing.
+- Do not run the complete PHP test suite after every small task.
+- Run the complete PHP test suite only when the user requests it, a phase/checkpoint is complete, before a commit or push, or a broad dependency, authentication, shared middleware, database, or configuration change creates meaningful regression risk.
+- For documentation-only changes, run `git diff --check`; do not run application tests or frontend builds.
+- For PHP changes, run focused tests and Laravel Pint only on changed PHP files through `vendor/bin/pint --dirty --format agent`.
+- For frontend changes, run focused linting for changed files. Do not run a production build unless entry points, dependencies, bundler configuration, shared application wiring, or a release checkpoint changed.
+- Reuse a recent passing full-suite or production-build result when no later change affects its coverage.
+- Report exactly which focused checks ran and clearly say when the full suite or production build was intentionally deferred.
+- Never skip validation of authentication, authorization, payments, destructive data operations, migrations, or other security-critical behavior; keep those checks focused when possible.

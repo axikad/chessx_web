@@ -114,4 +114,10 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    'email_otp' => [
+        'expires' => (int) env('EMAIL_OTP_EXPIRES_MINUTES', 10),
+        'resend_after' => (int) env('EMAIL_OTP_RESEND_SECONDS', 60),
+        'max_attempts' => (int) env('EMAIL_OTP_MAX_ATTEMPTS', 5),
+    ],
+
 ];

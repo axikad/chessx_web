@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
         $this->call(GeographySeeder::class);
         $this->call(CompetitionTierSeeder::class);
         $this->call(CompetitionRegionSeeder::class);
+        $this->call(PromotionRuleSeeder::class);
+        $this->call(SystemSettingSeeder::class);
         $this->call(SiteSettingSeeder::class);
     }
 }

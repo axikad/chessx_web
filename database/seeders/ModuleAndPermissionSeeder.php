@@ -31,6 +31,7 @@ class ModuleAndPermissionSeeder extends Seeder
             'seasons' => ['name' => 'Seasons', 'sort_order' => 110, 'permissions' => ['read', 'create', 'update', 'delete']],
             'ratings' => ['name' => 'Player Ratings', 'sort_order' => 120, 'permissions' => ['read', 'update']],
             'leaderboards' => ['name' => 'Leaderboards', 'sort_order' => 130, 'permissions' => ['read', 'generate']],
+            'promotions' => ['name' => 'Promotions', 'sort_order' => 140, 'permissions' => ['read', 'update', 'review']],
         ];
 
         foreach ($modules as $moduleSlug => $moduleData) {

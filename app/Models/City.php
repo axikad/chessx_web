@@ -16,9 +16,11 @@ class City extends Model
 
     /** @var list<string> */
     protected $fillable = [
+        'geonames_id',
         'state_id',
         'name',
         'normalized_name',
+        'district',
         'latitude',
         'longitude',
         'timezone',

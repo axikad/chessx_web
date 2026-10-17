@@ -14,8 +14,8 @@ test('permission seed data creates modules permissions and role assignments', fu
     $admin = User::query()->where('email', 'manager@chessx.test')->firstOrFail();
     $user = User::query()->where('email', 'user@chessx.test')->firstOrFail();
 
-    expect(Module::query()->count())->toBe(13)
-        ->and(Permission::query()->count())->toBe(42)
+    expect(Module::query()->count())->toBe(14)
+        ->and(Permission::query()->count())->toBe(45)
         ->and($admin->can('users.delete'))->toBeTrue()
         ->and($admin->can('branding.update'))->toBeTrue()
         ->and($admin->can('player_profiles.update'))->toBeTrue()
@@ -24,6 +24,7 @@ test('permission seed data creates modules permissions and role assignments', fu
         ->and($admin->can('seasons.create'))->toBeTrue()
         ->and($admin->can('ratings.update'))->toBeTrue()
         ->and($admin->can('leaderboards.generate'))->toBeTrue()
+        ->and($admin->can('promotions.review'))->toBeTrue()
         ->and($user->can('dashboard.read'))->toBeTrue()
         ->and($user->can('users.read'))->toBeFalse()
         ->and($user->can('competitions.read'))->toBeFalse()
@@ -39,11 +40,11 @@ test('permission seeding is idempotent', function () {
     );
     $this->seed(DatabaseSeeder::class);
 
-    expect(Module::query()->count())->toBe(13)
-        ->and(Permission::query()->count())->toBe(42)
-        ->and(Role::query()->where('slug', 'admin')->firstOrFail()->permissions()->count())->toBe(42)
+    expect(Module::query()->count())->toBe(14)
+        ->and(Permission::query()->count())->toBe(45)
+        ->and(Role::query()->where('slug', 'admin')->firstOrFail()->permissions()->count())->toBe(45)
         ->and($userRole->fresh()->hasPermission('users.read'))->toBeTrue()
-        ->and(PermissionAssignmentLog::query()->where('action', 'assigned')->count())->toBe(44);
+        ->and(PermissionAssignmentLog::query()->where('action', 'assigned')->count())->toBe(47);
 });
 
 test('competition foundation permissions use the intended action sets', function () {
@@ -56,5 +57,7 @@ test('competition foundation permissions use the intended action sets', function
         ->and(Permission::query()->whereHas('module', fn ($query) => $query->where('slug', 'ratings'))->pluck('action')->sort()->values()->all())
         ->toBe(['read', 'update'])
         ->and(Permission::query()->whereHas('module', fn ($query) => $query->where('slug', 'leaderboards'))->pluck('action')->sort()->values()->all())
-        ->toBe(['generate', 'read']);
+        ->toBe(['generate', 'read'])
+        ->and(Permission::query()->whereHas('module', fn ($query) => $query->where('slug', 'promotions'))->pluck('action')->sort()->values()->all())
+        ->toBe(['read', 'review', 'update']);
 });

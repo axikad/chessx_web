@@ -202,17 +202,48 @@ class LocationResolutionService
     /** @return Collection<int, array{city: City, distance: float}> */
     private function nearbyCities(float $latitude, float $longitude): Collection
     {
-        return City::query()
+        $radiusKm = $this->radiusKm();
+        $latitudeDelta = $radiusKm / 111.045;
+        $longitudeScale = max(abs(cos(deg2rad($latitude))), 0.01);
+        $longitudeDelta = min(180.0, $radiusKm / (111.045 * $longitudeScale));
+        $minimumLongitude = $longitude - $longitudeDelta;
+        $maximumLongitude = $longitude + $longitudeDelta;
+
+        $query = City::query()
             ->with('state.country')
             ->where('status', 'active')
+            ->whereHas(
+                'state.country',
+                fn ($query) => $query->whereIn('iso2', config('geography.supported_countries', [])),
+            )
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
+            ->whereBetween('latitude', [
+                max(-90.0, $latitude - $latitudeDelta),
+                min(90.0, $latitude + $latitudeDelta),
+            ]);
+
+        if ($longitudeDelta < 180.0 && $minimumLongitude < -180.0) {
+            $query->where(function ($query) use ($minimumLongitude, $maximumLongitude): void {
+                $query->where('longitude', '>=', $minimumLongitude + 360.0)
+                    ->orWhere('longitude', '<=', $maximumLongitude);
+            });
+        } elseif ($longitudeDelta < 180.0 && $maximumLongitude > 180.0) {
+            $query->where(function ($query) use ($minimumLongitude, $maximumLongitude): void {
+                $query->where('longitude', '>=', $minimumLongitude)
+                    ->orWhere('longitude', '<=', $maximumLongitude - 360.0);
+            });
+        } elseif ($longitudeDelta < 180.0) {
+            $query->whereBetween('longitude', [$minimumLongitude, $maximumLongitude]);
+        }
+
+        return $query
             ->get()
             ->map(fn (City $city): array => [
                 'city' => $city,
                 'distance' => $this->distanceKm($latitude, $longitude, (float) $city->latitude, (float) $city->longitude),
             ])
-            ->filter(fn (array $candidate): bool => $candidate['distance'] <= $this->radiusKm())
+            ->filter(fn (array $candidate): bool => $candidate['distance'] <= $radiusKm)
             ->sortBy('distance')
             ->take($this->candidateLimit())
             ->values();

@@ -31,6 +31,23 @@ test('users can not authenticate with invalid password', function () {
     $this->assertGuest();
 });
 
+test('users with a non-active account status can not authenticate', function (string $status) {
+    $user = User::factory()->create(['status' => $status]);
+
+    $response = $this->post('/login', [
+        'email' => $user->email,
+        'password' => 'password',
+    ]);
+
+    $this->assertGuest();
+    $response->assertSessionHasErrors([
+        'email' => __('auth.failed'),
+    ]);
+})->with([
+    'inactive account' => 'inactive',
+    'suspended account' => 'suspended',
+]);
+
 test('users can logout', function () {
     $user = User::factory()->create();
 

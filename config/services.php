@@ -1,5 +1,23 @@
 <?php
 
+$googleWebClientId = trim((string) env('GOOGLE_WEB_CLIENT_ID', ''));
+$googleClientIds = array_values(array_unique(array_filter([
+    $googleWebClientId,
+    ...array_map(
+        static fn (string $clientId): string => trim($clientId),
+        explode(',', (string) env('GOOGLE_CLIENT_IDS', '')),
+    ),
+])));
+$appleWebClientId = trim((string) env('APPLE_WEB_CLIENT_ID', ''));
+$appleNativeClientIds = array_values(array_unique(array_filter(array_map(
+    static fn (string $clientId): string => trim($clientId),
+    explode(',', (string) env('APPLE_CLIENT_IDS', '')),
+))));
+$appleClientIds = array_values(array_unique(array_filter([
+    $appleWebClientId,
+    ...$appleNativeClientIds,
+])));
+
 return [
 
     /*
@@ -26,6 +44,19 @@ return [
 
     'resend' => [
         'key' => env('RESEND_KEY'),
+    ],
+
+    'google' => [
+        'web_client_id' => $googleWebClientId !== '' ? $googleWebClientId : null,
+        'client_ids' => $googleClientIds,
+    ],
+
+    'apple' => [
+        'enabled' => (bool) env('APPLE_SIGN_IN_ENABLED', false),
+        'web_client_id' => $appleWebClientId !== '' ? $appleWebClientId : null,
+        'web_redirect_uri' => env('APPLE_WEB_REDIRECT_URI'),
+        'native_client_ids' => $appleNativeClientIds,
+        'client_ids' => $appleClientIds,
     ],
 
     'slack' => [

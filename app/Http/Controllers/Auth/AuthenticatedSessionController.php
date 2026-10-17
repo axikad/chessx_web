@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Services\Auth\AppleWebAuthorizationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,10 +17,25 @@ class AuthenticatedSessionController extends Controller
     /**
      * Show the login page.
      */
-    public function create(Request $request): Response
+    public function create(Request $request, AppleWebAuthorizationService $appleWebAuthorization): Response
     {
+        $appleClientId = config('services.apple.web_client_id');
+        $appleRedirectUri = config('services.apple.web_redirect_uri');
+        $appleAuthorization = null;
+
+        if (is_string($appleClientId) && $appleClientId !== ''
+            && is_string($appleRedirectUri) && $appleRedirectUri !== '') {
+            $appleAuthorization = [
+                'clientId' => $appleClientId,
+                'redirectUri' => $appleRedirectUri,
+                ...$appleWebAuthorization->issue($request->session()),
+            ];
+        }
+
         return Inertia::render('auth/login', [
             'canResetPassword' => Route::has('password.request'),
+            'googleClientId' => config('services.google.web_client_id'),
+            'appleAuthorization' => $appleAuthorization,
             'status' => $request->session()->get('status'),
         ]);
     }

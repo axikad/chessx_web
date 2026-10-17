@@ -13,7 +13,7 @@ class Country extends Model
     use HasFactory;
 
     /** @var list<string> */
-    protected $fillable = ['iso2', 'iso3', 'name', 'status'];
+    protected $fillable = ['geonames_id', 'iso2', 'iso3', 'name', 'status'];
 
     /** @return HasMany<State, $this> */
     public function states(): HasMany

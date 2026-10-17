@@ -1,4 +1,4 @@
-import { BarChart3, CalendarRange, Edit2, Plus, RefreshCw, ShieldCheck, Trash2, Trophy } from 'lucide-react';
+import { BarChart3, CalendarRange, Edit2, ImageUp, MapPinned, Plus, RefreshCw, ShieldCheck, Trash2, Trophy } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Badge } from '../../components/ui/Badge';
@@ -18,8 +18,9 @@ import {
     RatingRecord,
     SeasonRecord,
 } from '../../services/competitionService';
+import { CompetitionRegionManagementPanel } from './CompetitionRegionManagementPanel';
 
-type SectionId = 'competitions' | 'seasons' | 'ratings' | 'leaderboards';
+type SectionId = 'competitions' | 'regions' | 'seasons' | 'ratings' | 'leaderboards';
 const inputClass = 'w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-sm text-slate-900 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-indigo-950';
 const emptySeason = { name: '', starts_at: '', ends_at: '', status: 'scheduled' };
 
@@ -35,6 +36,7 @@ export const CompetitionManagementPage: React.FC = () => {
     const navigate = useNavigate();
     const allowedSections = useMemo(() => [
         can('competitions.read') && { id: 'competitions' as SectionId, label: 'Competitions', icon: <Trophy className="h-4 w-4" /> },
+        can('competitions.read') && { id: 'regions' as SectionId, label: 'Regions', icon: <MapPinned className="h-4 w-4" /> },
         can('seasons.read') && { id: 'seasons' as SectionId, label: 'Seasons', icon: <CalendarRange className="h-4 w-4" /> },
         can('ratings.read') && { id: 'ratings' as SectionId, label: 'Player Ratings', icon: <BarChart3 className="h-4 w-4" /> },
         can('leaderboards.read') && { id: 'leaderboards' as SectionId, label: 'Leaderboards', icon: <ShieldCheck className="h-4 w-4" /> },
@@ -62,6 +64,9 @@ export const CompetitionManagementPage: React.FC = () => {
     const [generateOpen, setGenerateOpen] = useState(false);
     const [generateForm, setGenerateForm] = useState({ season_id: 0, tier_id: 0, region_id: 0 });
     const [saving, setSaving] = useState(false);
+    const [artworkTier, setArtworkTier] = useState<CompetitionTierRecord | null>(null);
+    const [artworkFile, setArtworkFile] = useState<File | null>(null);
+    const [artworkPreview, setArtworkPreview] = useState<string | null>(null);
 
     const loadSection = useCallback(async (section?: SectionId) => {
         if (!section) return;
@@ -192,18 +197,56 @@ export const CompetitionManagementPage: React.FC = () => {
         }
     };
 
+    const openArtwork = (tier: CompetitionTierRecord) => {
+        setArtworkTier(tier);
+        setArtworkFile(null);
+        setArtworkPreview(tier.imageUrl ?? null);
+    };
+
+    const selectArtwork = (file: File | null) => {
+        if (artworkPreview?.startsWith('blob:')) URL.revokeObjectURL(artworkPreview);
+        setArtworkFile(file);
+        setArtworkPreview(file ? URL.createObjectURL(file) : artworkTier?.imageUrl ?? null);
+    };
+
+    const closeArtwork = () => {
+        if (artworkPreview?.startsWith('blob:')) URL.revokeObjectURL(artworkPreview);
+        setArtworkTier(null);
+        setArtworkFile(null);
+        setArtworkPreview(null);
+    };
+
+    const saveArtwork = async (event: React.FormEvent) => {
+        event.preventDefault();
+        if (!artworkTier || !artworkFile) return;
+
+        setSaving(true);
+        try {
+            await competitionService.updateCompetitionArtwork(artworkTier.id, artworkFile);
+            closeArtwork();
+            await loadSection('competitions');
+            showToast('success', 'Competition artwork updated successfully');
+        } catch (error) {
+            showToast('error', error instanceof Error ? error.message : 'Could not update competition artwork');
+        } finally {
+            setSaving(false);
+        }
+    };
+
     if (!activeSection) {
         return <div className="rounded-xl border border-slate-200 bg-white p-8 text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900">You do not have permission to view competition management.</div>;
     }
 
     const competitionColumns: Column<CompetitionTierRecord>[] = [
         { key: 'sequenceNumber', header: '#', align: 'center' },
+        { key: 'imageUrl', header: 'Artwork', render: (tier) => tier.imageUrl ? <img src={tier.imageUrl} alt={`${tier.name} artwork`} className="h-14 w-24 rounded-lg border border-slate-200 object-cover dark:border-slate-700" /> : <div className="grid h-14 w-24 place-items-center rounded-lg border border-dashed border-slate-300 text-[10px] text-slate-400 dark:border-slate-700">No image</div> },
         { key: 'name', header: 'Competition Tier', sortable: true, render: (tier) => <div><span className="font-semibold text-slate-900 dark:text-white">{tier.name}</span><span className="block font-mono text-[11px] text-slate-400">{tier.code}</span></div> },
         { key: 'scopeType', header: 'Scope', render: (tier) => <Badge variant="info">{tier.scopeType}</Badge> },
         { key: 'regionCount', header: 'Regions', align: 'center' },
         { key: 'playerCount', header: 'Eligible Players', align: 'center' },
         { key: 'isActive', header: 'Status', render: (tier) => <Badge variant={tier.isActive ? 'success' : 'neutral'} dot>{tier.isActive ? 'Active' : 'Inactive'}</Badge> },
     ];
+    if (can('competitions.update')) competitionColumns.push({ key: 'actions', header: 'Actions', align: 'right', render: (tier) => <Button size="sm" variant="outline" onClick={() => openArtwork(tier)} leftIcon={<ImageUp className="h-3.5 w-3.5" />}>Change Image</Button> });
     const seasonColumns: Column<SeasonRecord>[] = [
         { key: 'name', header: 'Season', sortable: true, render: (season) => <span className="font-semibold text-slate-900 dark:text-white">{season.name}</span> },
         { key: 'startsAt', header: 'Starts', render: (season) => new Date(season.startsAt).toLocaleDateString() },
@@ -240,6 +283,7 @@ export const CompetitionManagementPage: React.FC = () => {
         <Tabs tabs={allowedSections} activeTab={activeSection} variant="pills" onChange={(section) => navigate(`/competition-management/${section}`)} />
 
         {activeSection === 'competitions' && <DataTable title="Competition Tiers" columns={competitionColumns} data={tiers} keyField="id" isLoading={loading} selectable={false} searchPlaceholder="Search tiers..." emptyTitle="No competition tiers" />}
+        {activeSection === 'regions' && <CompetitionRegionManagementPanel />}
         {activeSection === 'seasons' && <DataTable title="Seasons" columns={seasonColumns} data={seasons} keyField="id" isLoading={loading} selectable={false} searchPlaceholder="Search seasons..." actions={can('seasons.create') ? <Button size="sm" onClick={() => openSeason()} leftIcon={<Plus className="h-3.5 w-3.5" />}>Create Season</Button> : undefined} emptyTitle="No seasons found" />}
         {activeSection === 'ratings' && <DataTable title="Player Ratings" columns={ratingColumns} data={ratings} keyField="id" isLoading={loading} selectable={false} searchPlaceholder="Search players or tiers..." emptyTitle="No player ratings" />}
         {activeSection === 'leaderboards' && <DataTable title="Leaderboard Snapshots" columns={leaderboardColumns} data={leaderboards} keyField="id" isLoading={loading} selectable={false} searchPlaceholder="Search leaderboard history..." actions={can('leaderboards.generate') ? <Button size="sm" onClick={openGenerate} leftIcon={<RefreshCw className="h-3.5 w-3.5" />}>Generate Snapshot</Button> : undefined} emptyTitle="No leaderboard snapshots" />}
@@ -262,6 +306,20 @@ export const CompetitionManagementPage: React.FC = () => {
 
         {can('leaderboards.generate') && <Modal isOpen={generateOpen} onClose={() => setGenerateOpen(false)} title="Generate Leaderboard Snapshot" description="Capture the current ranked standings without replacing earlier snapshots.">
             <form onSubmit={generateLeaderboard} className="space-y-4"><label className="block space-y-1.5"><span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Season *</span><select className={inputClass} value={generateForm.season_id} onChange={(event) => setGenerateForm({ ...generateForm, season_id: Number(event.target.value) })} required><option value={0}>Select season</option>{leaderboardSeasons.map((season) => <option key={season.id} value={season.id}>{season.name}</option>)}</select></label><label className="block space-y-1.5"><span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Competition Tier *</span><select className={inputClass} value={generateForm.tier_id} onChange={(event) => setGenerateForm({ ...generateForm, tier_id: Number(event.target.value), region_id: 0 })} required><option value={0}>Select tier</option>{leaderboardTiers.map((tier) => <option key={tier.id} value={tier.id}>{tier.name}</option>)}</select></label><label className="block space-y-1.5"><span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Region</span><select className={inputClass} value={generateForm.region_id} onChange={(event) => setGenerateForm({ ...generateForm, region_id: Number(event.target.value) })}><option value={0}>All regions</option>{selectedLeaderboardTier?.regions?.map((region) => <option key={region.id} value={region.id}>{region.name}</option>)}</select></label><div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={() => setGenerateOpen(false)}>Cancel</Button><Button type="submit" isLoading={saving} disabled={!generateForm.season_id || !generateForm.tier_id}>Generate Snapshot</Button></div></form>
+        </Modal>}
+
+        {can('competitions.update') && <Modal isOpen={Boolean(artworkTier)} onClose={closeArtwork} title="Change League Artwork" description={artworkTier ? `Upload the mobile card artwork for ${artworkTier.name}.` : undefined}>
+            <form onSubmit={saveArtwork} className="space-y-4">
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/60">
+                    {artworkPreview ? <img src={artworkPreview} alt="League artwork preview" className="aspect-[16/9] w-full object-cover" /> : <div className="grid aspect-[16/9] place-items-center text-sm text-slate-400">Select an image to preview</div>}
+                </div>
+                <label className="block space-y-1.5">
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">Artwork image *</span>
+                    <input type="file" required accept="image/png,image/jpeg,image/webp" onChange={(event) => selectArtwork(event.target.files?.[0] ?? null)} className="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-indigo-50 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-indigo-700 hover:file:bg-indigo-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:file:bg-indigo-950/50 dark:file:text-indigo-300" />
+                    <span className="block text-[11px] text-slate-400">PNG, JPG, or WebP up to 5 MB. A 16:9 landscape image works best for mobile cards.</span>
+                </label>
+                <div className="flex justify-end gap-2"><Button type="button" variant="outline" onClick={closeArtwork}>Cancel</Button><Button type="submit" isLoading={saving} disabled={!artworkFile}>Upload Image</Button></div>
+            </form>
         </Modal>}
     </div>;
 };

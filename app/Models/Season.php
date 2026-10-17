@@ -53,4 +53,16 @@ class Season extends Model
     {
         return $this->hasMany(LeaderboardSnapshot::class);
     }
+
+    /** @return HasMany<Game, $this> */
+    public function games(): HasMany
+    {
+        return $this->hasMany(Game::class);
+    }
+
+    /** @return HasMany<Tournament, $this> */
+    public function tournaments(): HasMany
+    {
+        return $this->hasMany(Tournament::class);
+    }
 }
