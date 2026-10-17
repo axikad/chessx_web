@@ -22,7 +22,7 @@ final class EmailOtpException extends RuntimeException
 
     public static function inactive(): self
     {
-        return new self('This ChessX account is not active.', 422, 'account_inactive', 'email');
+        return new self('This Chess Mission account is not active.', 422, 'account_inactive', 'email');
     }
 
     public static function unavailable(): self

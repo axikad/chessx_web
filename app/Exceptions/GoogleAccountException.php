@@ -8,22 +8,22 @@ final class GoogleAccountException extends RuntimeException
 {
     public static function notLinked(): self
     {
-        return new self('No ChessX account exists for this verified Google email yet.');
+        return new self('No Chess Mission account exists for this verified Google email yet.');
     }
 
     public static function emailNotVerified(): self
     {
-        return new self('Google must verify your email before ChessX can link this account.');
+        return new self('Google must verify your email before Chess Mission can link this account.');
     }
 
     public static function conflictingLink(): self
     {
-        return new self('This ChessX account is already linked to another Google account.');
+        return new self('This Chess Mission account is already linked to another Google account.');
     }
 
     public static function inactive(): self
     {
-        return new self('This ChessX account is not active.');
+        return new self('This Chess Mission account is not active.');
     }
 
     public static function unavailable(): self

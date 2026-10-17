@@ -16,7 +16,7 @@ class SiteSetting extends Model
 
     public static function current(): self
     {
-        return static::query()->firstOrCreate([], ['name' => 'ChessX', 'slogan' => 'React + Laravel']);
+        return static::query()->firstOrCreate([], ['name' => 'Chess Mission', 'slogan' => 'React + Laravel']);
     }
 
     public function logoUrl(): ?string

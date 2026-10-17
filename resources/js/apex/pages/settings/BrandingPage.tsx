@@ -79,7 +79,7 @@ export const BrandingPage: React.FC = () => {
     );
 
     return <div className="space-y-6">
-        <PageHeader title="Site Branding" subtitle="Manage the identity displayed throughout ChessX." breadcrumbs={[{ label: 'Site Branding' }]} />
+        <PageHeader title="Site Branding" subtitle="Manage the identity displayed throughout Chess Mission." breadcrumbs={[{ label: 'Site Branding' }]} />
         <Card className="max-w-3xl">
             <CardHeader title="Brand settings" description="The site name, slogan, logo, and favicon update across the application." />
             <CardBody><form onSubmit={save} className="space-y-5">

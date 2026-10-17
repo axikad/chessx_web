@@ -143,7 +143,7 @@ it('returns 422 without issuing tokens for an inactive Google account', function
         'device_id' => 'inactive-google-device',
     ])->assertUnprocessable()
         ->assertJsonValidationErrors('google')
-        ->assertJsonPath('errors.google.0', 'This ChessX account is not active.');
+        ->assertJsonPath('errors.google.0', 'This Chess Mission account is not active.');
     expect(MobileSession::query()->count())->toBe(0);
     $this->assertDatabaseCount('personal_access_tokens', 0);
 });

@@ -8,27 +8,27 @@ final class AppleAccountException extends RuntimeException
 {
     public static function notLinked(): self
     {
-        return new self('This Apple identity is not linked to a ChessX account.');
+        return new self('This Apple identity is not linked to a Chess Mission account.');
     }
 
     public static function emailNotVerified(): self
     {
-        return new self('Apple must verify your email before ChessX can link this account.');
+        return new self('Apple must verify your email before Chess Mission can link this account.');
     }
 
     public static function emailUnavailable(): self
     {
-        return new self('Apple did not provide an email for this new ChessX account.');
+        return new self('Apple did not provide an email for this new Chess Mission account.');
     }
 
     public static function conflictingLink(): self
     {
-        return new self('This ChessX account is already linked to another Apple account.');
+        return new self('This Chess Mission account is already linked to another Apple account.');
     }
 
     public static function inactive(): self
     {
-        return new self('This ChessX account is not active.');
+        return new self('This Chess Mission account is not active.');
     }
 
     public static function unavailable(): self

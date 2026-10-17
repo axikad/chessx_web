@@ -279,7 +279,7 @@ export const CompetitionManagementPage: React.FC = () => {
     const selectedLeaderboardTier = leaderboardTiers.find((tier) => tier.id === generateForm.tier_id);
 
     return <div className="space-y-6">
-        <PageHeader title="Competition Management" subtitle="Manage the ChessX competition structure, seasons, ratings, and leaderboard history." breadcrumbs={[{ label: 'Competition Management' }]} />
+        <PageHeader title="Competition Management" subtitle="Manage the Chess Mission competition structure, seasons, ratings, and leaderboard history." breadcrumbs={[{ label: 'Competition Management' }]} />
         <Tabs tabs={allowedSections} activeTab={activeSection} variant="pills" onChange={(section) => navigate(`/competition-management/${section}`)} />
 
         {activeSection === 'competitions' && <DataTable title="Competition Tiers" columns={competitionColumns} data={tiers} keyField="id" isLoading={loading} selectable={false} searchPlaceholder="Search tiers..." emptyTitle="No competition tiers" />}

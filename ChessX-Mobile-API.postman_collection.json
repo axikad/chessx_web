@@ -1,8 +1,8 @@
 {
     "info": {
         "_postman_id": "3172de71-4a5e-4e4f-97fc-b087be73de89",
-        "name": "ChessX Mobile API",
-        "description": "ChessX mobile authentication, application configuration, onboarding, player profile, location, and geography API contract. Includes password, four-digit email OTP, Google, and Apple login. Every request includes saved success and important error examples. Successful login and refresh requests automatically save access_token, refresh_token, and session_id as collection variables.",
+        "name": "Chess Mission Mobile API",
+        "description": "Chess Mission mobile authentication, application configuration, onboarding, player profile, location, and geography API contract. Includes password, four-digit email OTP, Google, and Apple login. Every request includes saved success and important error examples. Successful login and refresh requests automatically save access_token, refresh_token, and session_id as collection variables.",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
@@ -124,7 +124,7 @@
                             }
                         },
                         "url": "{{base_url}}/api/v1/auth/login",
-                        "description": "Authenticates an active ChessX account using email and password. Required fields: email, password, device_name, platform (android or ios), and a stable device_id. Returns a 15-minute access token and a rotating 30-day refresh token."
+                        "description": "Authenticates an active Chess Mission account using email and password. Required fields: email, password, device_name, platform (android or ios), and a stable device_id. Returns a 15-minute access token and a rotating 30-day refresh token."
                     },
                     "response": [
                         {
@@ -151,7 +151,7 @@
                                     }
                                 },
                                 "url": "{{base_url}}/api/v1/auth/login",
-                                "description": "Authenticates an active ChessX account using email and password. Returns a 15-minute access token and a rotating 30-day refresh token."
+                                "description": "Authenticates an active Chess Mission account using email and password. Returns a 15-minute access token and a rotating 30-day refresh token."
                             },
                             "status": "OK",
                             "code": 200,
@@ -190,7 +190,7 @@
                                     }
                                 },
                                 "url": "{{base_url}}/api/v1/auth/login",
-                                "description": "Authenticates an active ChessX account using email and password. Returns a 15-minute access token and a rotating 30-day refresh token."
+                                "description": "Authenticates an active Chess Mission account using email and password. Returns a 15-minute access token and a rotating 30-day refresh token."
                             },
                             "status": "Unprocessable Content",
                             "code": 422,
@@ -229,7 +229,7 @@
                                     }
                                 },
                                 "url": "{{base_url}}/api/v1/auth/login",
-                                "description": "Authenticates an active ChessX account using email and password. Returns a 15-minute access token and a rotating 30-day refresh token."
+                                "description": "Authenticates an active Chess Mission account using email and password. Returns a 15-minute access token and a rotating 30-day refresh token."
                             },
                             "status": "Unprocessable Content",
                             "code": 422,
@@ -268,7 +268,7 @@
                                     }
                                 },
                                 "url": "{{base_url}}/api/v1/auth/login",
-                                "description": "Authenticates an active ChessX account using email and password. Returns a 15-minute access token and a rotating 30-day refresh token."
+                                "description": "Authenticates an active Chess Mission account using email and password. Returns a 15-minute access token and a rotating 30-day refresh token."
                             },
                             "status": "Too Many Requests",
                             "code": 429,
@@ -450,7 +450,7 @@
                             "body": "{\n    \"success\": false,\n    \"message\": \"The Google identity token is invalid.\",\n    \"code\": \"google_token_invalid\"\n}"
                         },
                         {
-                            "name": "422 - Inactive ChessX Account",
+                            "name": "422 - Inactive Chess Mission Account",
                             "originalRequest": {
                                 "method": "POST",
                                 "header": [
@@ -486,7 +486,7 @@
                                 }
                             ],
                             "cookie": [],
-                            "body": "{\n    \"success\": false,\n    \"message\": \"The submitted data is invalid.\",\n    \"code\": \"validation_failed\",\n    \"errors\": {\n        \"google\": [\n            \"This ChessX account is not active.\"\n        ]\n    }\n}"
+                            "body": "{\n    \"success\": false,\n    \"message\": \"The submitted data is invalid.\",\n    \"code\": \"validation_failed\",\n    \"errors\": {\n        \"google\": [\n            \"This Chess Mission account is not active.\"\n        ]\n    }\n}"
                         },
                         {
                             "name": "422 - Invalid Request",
@@ -860,7 +860,7 @@
                             "body": "{\n    \"success\": false,\n    \"message\": \"The Apple identity token is invalid.\",\n    \"code\": \"apple_token_invalid\"\n}"
                         },
                         {
-                            "name": "422 - Inactive ChessX Account",
+                            "name": "422 - Inactive Chess Mission Account",
                             "originalRequest": {
                                 "method": "POST",
                                 "header": [
@@ -896,7 +896,7 @@
                                 }
                             ],
                             "cookie": [],
-                            "body": "{\n    \"success\": false,\n    \"message\": \"The submitted data is invalid.\",\n    \"code\": \"validation_failed\",\n    \"errors\": {\n        \"apple\": [\n            \"This ChessX account is not active.\"\n        ]\n    }\n}"
+                            "body": "{\n    \"success\": false,\n    \"message\": \"The submitted data is invalid.\",\n    \"code\": \"validation_failed\",\n    \"errors\": {\n        \"apple\": [\n            \"This Chess Mission account is not active.\"\n        ]\n    }\n}"
                         },
                         {
                             "name": "422 - Email Missing for New Account",
@@ -935,7 +935,7 @@
                                 }
                             ],
                             "cookie": [],
-                            "body": "{\n    \"success\": false,\n    \"message\": \"The submitted data is invalid.\",\n    \"code\": \"validation_failed\",\n    \"errors\": {\n        \"apple\": [\n            \"Apple did not provide an email for this new ChessX account.\"\n        ]\n    }\n}"
+                            "body": "{\n    \"success\": false,\n    \"message\": \"The submitted data is invalid.\",\n    \"code\": \"validation_failed\",\n    \"errors\": {\n        \"apple\": [\n            \"Apple did not provide an email for this new Chess Mission account.\"\n        ]\n    }\n}"
                         },
                         {
                             "name": "422 - Invalid Request",
@@ -1094,7 +1094,7 @@
                                 }
                             ],
                             "cookie": [],
-                            "body": "{\n    \"success\": true,\n    \"message\": \"If this email can use ChessX, a login code has been sent.\",\n    \"data\": {\n        \"expires_in\": 600,\n        \"resend_after\": 60\n    }\n}"
+                            "body": "{\n    \"success\": true,\n    \"message\": \"If this email can use Chess Mission, a login code has been sent.\",\n    \"data\": {\n        \"expires_in\": 600,\n        \"resend_after\": 60\n    }\n}"
                         },
                         {
                             "name": "422 - Invalid Email",
@@ -1377,7 +1377,7 @@
                                 }
                             ],
                             "cookie": [],
-                            "body": "{\n    \"success\": false,\n    \"message\": \"The submitted data is invalid.\",\n    \"code\": \"validation_failed\",\n    \"errors\": {\n        \"email\": [\n            \"This ChessX account is not active.\"\n        ]\n    }\n}"
+                            "body": "{\n    \"success\": false,\n    \"message\": \"The submitted data is invalid.\",\n    \"code\": \"validation_failed\",\n    \"errors\": {\n        \"email\": [\n            \"This Chess Mission account is not active.\"\n        ]\n    }\n}"
                         },
                         {
                             "name": "422 - Invalid Request",
@@ -1797,7 +1797,7 @@
                                 }
                             ],
                             "cookie": [],
-                            "body": "{\n    \"success\": false,\n    \"message\": \"This ChessX account is not active.\",\n    \"code\": \"account_inactive\"\n}"
+                            "body": "{\n    \"success\": false,\n    \"message\": \"This Chess Mission account is not active.\",\n    \"code\": \"account_inactive\"\n}"
                         }
                     ]
                 },
@@ -3702,7 +3702,7 @@
                                 }
                             ],
                             "cookie": [],
-                            "body": "{\n    \"success\": false,\n    \"message\": \"This ChessX account is not active.\",\n    \"code\": \"account_inactive\"\n}"
+                            "body": "{\n    \"success\": false,\n    \"message\": \"This Chess Mission account is not active.\",\n    \"code\": \"account_inactive\"\n}"
                         }
                     ]
                 },

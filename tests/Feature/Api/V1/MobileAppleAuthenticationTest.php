@@ -121,7 +121,7 @@ it('returns 422 when Apple has not verified the email for an unlinked identity',
 
     $this->postJson('/api/v1/auth/apple', mobileApplePayload())
         ->assertUnprocessable()
-        ->assertJsonPath('errors.apple.0', 'Apple must verify your email before ChessX can link this account.');
+        ->assertJsonPath('errors.apple.0', 'Apple must verify your email before Chess Mission can link this account.');
     $this->assertDatabaseCount('users', 0);
 });
 
@@ -139,7 +139,7 @@ it('returns 422 when the matching ChessX account is linked to another Apple subj
 
     $this->postJson('/api/v1/auth/apple', mobileApplePayload())
         ->assertUnprocessable()
-        ->assertJsonPath('errors.apple.0', 'This ChessX account is already linked to another Apple account.');
+        ->assertJsonPath('errors.apple.0', 'This Chess Mission account is already linked to another Apple account.');
     expect($user->authProviders()->count())->toBe(1);
     $this->assertDatabaseCount('personal_access_tokens', 0);
 });
@@ -199,7 +199,7 @@ it('returns 422 when an unlinked Apple identity does not include an email', func
     $this->postJson('/api/v1/auth/apple', mobileApplePayload())
         ->assertUnprocessable()
         ->assertJsonValidationErrors('apple')
-        ->assertJsonPath('errors.apple.0', 'Apple did not provide an email for this new ChessX account.');
+        ->assertJsonPath('errors.apple.0', 'Apple did not provide an email for this new Chess Mission account.');
 });
 
 it('returns 422 without consuming the identity when the Player role is unavailable', function () {
@@ -225,7 +225,7 @@ it('returns 422 without issuing tokens for an inactive linked Apple account', fu
 
     $this->postJson('/api/v1/auth/apple', mobileApplePayload())
         ->assertUnprocessable()
-        ->assertJsonPath('errors.apple.0', 'This ChessX account is not active.');
+        ->assertJsonPath('errors.apple.0', 'This Chess Mission account is not active.');
     $this->assertDatabaseCount('personal_access_tokens', 0);
 });
 

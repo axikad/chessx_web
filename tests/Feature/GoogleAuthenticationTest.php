@@ -196,7 +196,7 @@ test('an unverified Google email cannot link a matching ChessX account', functio
     ]);
 
     $response->assertSessionHasErrors([
-        'google' => 'Google must verify your email before ChessX can link this account.',
+        'google' => 'Google must verify your email before Chess Mission can link this account.',
     ]);
     $this->assertGuest();
     expect($user->authProviders()->count())->toBe(0)
@@ -278,7 +278,7 @@ test('a ChessX account linked to another Google subject rejects the new identity
     ]);
 
     $response->assertSessionHasErrors([
-        'google' => 'This ChessX account is already linked to another Google account.',
+        'google' => 'This Chess Mission account is already linked to another Google account.',
     ]);
     $this->assertGuest();
     expect($user->authProviders()->count())->toBe(1)
@@ -299,7 +299,7 @@ test('an inactive matching ChessX account is not linked to Google', function () 
     ]);
 
     $response->assertSessionHasErrors([
-        'google' => 'This ChessX account is not active.',
+        'google' => 'This Chess Mission account is not active.',
     ]);
     $this->assertGuest();
     expect($user->authProviders()->count())->toBe(0);
@@ -319,7 +319,7 @@ test('an inactive linked account cannot start a Google session', function () {
     ]);
 
     $response->assertSessionHasErrors([
-        'google' => 'This ChessX account is not active.',
+        'google' => 'This Chess Mission account is not active.',
     ]);
     $this->assertGuest();
     expect($user->refresh()->last_login_at)->toBeNull();

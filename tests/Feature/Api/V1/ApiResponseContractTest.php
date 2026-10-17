@@ -44,7 +44,7 @@ it('nests OTP timing information inside the success data envelope', function () 
 
     $response->assertAccepted()->assertExactJson([
         'success' => true,
-        'message' => 'If this email can use ChessX, a login code has been sent.',
+        'message' => 'If this email can use Chess Mission, a login code has been sent.',
         'data' => [
             'expires_in' => 600,
             'resend_after' => 60,

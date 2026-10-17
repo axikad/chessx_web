@@ -18,7 +18,7 @@ class EnsureActiveApiUser
     {
         if ($request->user()?->status !== 'active') {
             return ApiResponse::error(
-                'This ChessX account is not active.',
+                'This Chess Mission account is not active.',
                 'account_inactive',
                 Response::HTTP_FORBIDDEN,
             );

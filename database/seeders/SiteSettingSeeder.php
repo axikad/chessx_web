@@ -12,6 +12,6 @@ class SiteSettingSeeder extends Seeder
      */
     public function run(): void
     {
-        SiteSetting::query()->firstOrCreate([], ['name' => 'ChessX', 'slogan' => 'React + Laravel']);
+        SiteSetting::query()->firstOrCreate([], ['name' => 'Chess Mission', 'slogan' => 'React + Laravel']);
     }
 }

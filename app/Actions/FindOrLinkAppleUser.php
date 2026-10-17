@@ -122,7 +122,7 @@ final class FindOrLinkAppleUser
 
         return User::query()->create([
             'role_id' => $role->getKey(),
-            'name' => $name !== '' ? $name : 'ChessX Player',
+            'name' => $name !== '' ? $name : 'Chess Mission Player',
             'email' => $identity['email'],
             'email_verified_at' => now(),
             'password' => Hash::make(Str::random(64)),

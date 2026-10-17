@@ -31,8 +31,8 @@ class EmailLoginOtpNotification extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         return (new MailMessage)
-            ->subject('Your ChessX login code')
-            ->greeting('Sign in to ChessX')
+            ->subject('Your Chess Mission login code')
+            ->greeting('Sign in to Chess Mission')
             ->line('Your one-time login code is:')
             ->line($this->code)
             ->line("This code expires in {$this->expiresInMinutes} minutes and can only be used once.")

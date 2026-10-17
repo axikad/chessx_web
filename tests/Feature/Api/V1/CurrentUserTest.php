@@ -52,7 +52,7 @@ it('returns 403 when an authenticated mobile account is inactive', function () {
 
     $response->assertForbidden()->assertExactJson([
         'success' => false,
-        'message' => 'This ChessX account is not active.',
+        'message' => 'This Chess Mission account is not active.',
         'code' => 'account_inactive',
     ]);
 });

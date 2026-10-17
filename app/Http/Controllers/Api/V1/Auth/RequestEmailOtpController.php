@@ -25,7 +25,7 @@ class RequestEmailOtpController extends Controller
                 'expires_in' => max(1, (int) config('auth.email_otp.expires', 10)) * 60,
                 'resend_after' => max(1, (int) config('auth.email_otp.resend_after', 60)),
             ],
-            'If this email can use ChessX, a login code has been sent.',
+            'If this email can use Chess Mission, a login code has been sent.',
             Response::HTTP_ACCEPTED,
         );
     }

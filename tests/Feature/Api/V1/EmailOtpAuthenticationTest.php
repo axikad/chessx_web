@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 
-it('renders the login code and expiry in the email notification', function () {
+it('renders Chess Mission branding, the login code, and expiry in the email notification', function () {
     $html = (string) (new EmailLoginOtpNotification('1234', 10))->toMail(new stdClass)->render();
 
-    expect($html)->toContain('1234')
+    expect($html)->toContain('Sign in to Chess Mission')
+        ->and($html)->toContain('1234')
         ->and($html)->toContain('10 minutes')
         ->and($html)->toContain('can only be used once');
 });
@@ -29,7 +30,7 @@ it('sends a hashed single-use login code to a normalized email', function () {
 
     $response->assertAccepted()->assertExactJson([
         'success' => true,
-        'message' => 'If this email can use ChessX, a login code has been sent.',
+        'message' => 'If this email can use Chess Mission, a login code has been sent.',
         'data' => [
             'expires_in' => 600,
             'resend_after' => 60,
@@ -83,7 +84,7 @@ it('returns the generic accepted response without emailing an inactive account',
 
     $response->assertAccepted()->assertJsonPath(
         'message',
-        'If this email can use ChessX, a login code has been sent.',
+        'If this email can use Chess Mission, a login code has been sent.',
     );
     Notification::assertNothingSent();
     expect(EmailLoginOtp::query()->count())->toBe(0);
@@ -231,7 +232,7 @@ it('returns 422 and consumes a valid code when the account became inactive', fun
         'device_id' => 'inactive-otp-device',
     ])->assertUnprocessable()
         ->assertJsonValidationErrors('email')
-        ->assertJsonPath('errors.email.0', 'This ChessX account is not active.');
+        ->assertJsonPath('errors.email.0', 'This Chess Mission account is not active.');
 
     $this->assertModelMissing($otp);
     $this->assertDatabaseCount('personal_access_tokens', 0);

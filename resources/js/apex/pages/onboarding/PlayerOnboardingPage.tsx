@@ -135,7 +135,7 @@ export const PlayerOnboardingPage: React.FC = () => {
     return (
         <div className="mx-auto max-w-5xl space-y-6">
             <PageHeader
-                title="Set up your ChessX player account"
+                title="Set up your Chess Mission player account"
                 subtitle="Confirm your player identity and home city before entering competition."
                 breadcrumbs={[{ label: 'Player Onboarding' }]}
             />
@@ -218,7 +218,7 @@ export const PlayerOnboardingPage: React.FC = () => {
                                 <div className="space-y-4">
                                     <div className="flex gap-3 rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-xs leading-relaxed text-indigo-800 dark:border-indigo-900/60 dark:bg-indigo-950/30 dark:text-indigo-200">
                                         <ShieldCheck className="h-5 w-5 shrink-0" />
-                                        <p>Your coordinates are used only to find nearby supported cities. ChessX stores the city you confirm, not your raw GPS coordinates.</p>
+                                        <p>Your coordinates are used only to find nearby supported cities. Chess Mission stores the city you confirm, not your raw GPS coordinates.</p>
                                     </div>
                                     <Button className="w-full" onClick={resolveLocation} isLoading={resolvingLocation} leftIcon={<LocateFixed className="h-4 w-4" />}>
                                         Find Nearby Cities

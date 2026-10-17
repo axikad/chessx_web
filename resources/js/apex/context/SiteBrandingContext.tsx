@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { SiteBranding } from '../types/site';
 
-const defaults: SiteBranding = { name: 'ChessX', slogan: 'React + Laravel', logo_url: null, favicon_url: null };
+const defaults: SiteBranding = { name: 'Chess Mission', slogan: 'React + Laravel', logo_url: null, favicon_url: null };
 
 type SiteBrandingContextValue = {
     site: SiteBranding;

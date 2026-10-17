@@ -18,7 +18,7 @@ test('a user with branding permissions can read and update branding', function (
     app(RolePermissionService::class)->sync($role, [$read->id, $update->id], $user);
 
     $this->actingAs($user)->getJson(route('management.branding.show'))
-        ->assertOk()->assertJsonPath('data.name', 'ChessX');
+        ->assertOk()->assertJsonPath('data.name', 'Chess Mission');
 
     $response = $this->post(route('management.branding.update'), [
         'name' => 'Knight Club',
@@ -55,7 +55,7 @@ test('branding validates image types and sizes', function () {
     $user = User::factory()->for(Role::factory()->superAdmin())->create();
 
     $this->actingAs($user)->withHeader('Accept', 'application/json')->post(route('management.branding.update'), [
-        'name' => 'ChessX',
+        'name' => 'Chess Mission',
         'logo' => UploadedFile::fake()->create('logo.pdf', 100, 'application/pdf'),
     ])->assertUnprocessable()->assertJsonValidationErrors('logo');
 });

@@ -77,7 +77,7 @@ final class EmailOtpService
                 ->where('otp_hash', $otpHash)
                 ->delete();
 
-            Log::warning('Unable to deliver a ChessX email login code.', [
+            Log::warning('Unable to deliver a Chess Mission email login code.', [
                 'email_hash' => hash('sha256', $email),
                 'exception' => $exception::class,
             ]);
@@ -187,7 +187,7 @@ final class EmailOtpService
             ->limit(255, '')
             ->value();
 
-        return $name !== '' ? $name : 'ChessX Player';
+        return $name !== '' ? $name : 'Chess Mission Player';
     }
 
     private function expiresInMinutes(): int
