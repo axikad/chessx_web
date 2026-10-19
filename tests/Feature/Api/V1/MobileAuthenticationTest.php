@@ -23,7 +23,8 @@ it('issues short-lived access and hashed refresh tokens to an active mobile user
     $response->assertOk()
         ->assertJsonPath('data.token_type', 'Bearer')
         ->assertJsonPath('data.expires_in', 900)
-        ->assertJsonPath('data.user.id', $user->uuid)
+        ->assertJsonPath('data.user.id', $user->id)
+        ->assertJsonPath('data.user.uuid', $user->uuid)
         ->assertJsonPath('data.user.email', 'mobile@example.test');
 
     $accessToken = $response->json('data.access_token');

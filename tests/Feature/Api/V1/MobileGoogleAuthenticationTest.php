@@ -55,7 +55,8 @@ it('issues mobile tokens for a linked active Google account', function () {
         ->assertJsonPath('data.token_type', 'Bearer')
         ->assertJsonPath('data.expires_in', 900)
         ->assertJsonPath('data.is_new_user', false)
-        ->assertJsonPath('data.user.id', $user->uuid)
+        ->assertJsonPath('data.user.id', $user->id)
+        ->assertJsonPath('data.user.uuid', $user->uuid)
         ->assertJsonPath('data.user.email', 'mobile-google@example.test');
     $this->assertGuest();
     $this->assertDatabaseHas('mobile_sessions', [

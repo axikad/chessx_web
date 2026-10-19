@@ -85,7 +85,8 @@ it('issues mobile tokens for a linked active Apple account without requiring ema
 
     $response->assertOk()
         ->assertJsonPath('data.is_new_user', false)
-        ->assertJsonPath('data.user.id', $user->uuid);
+        ->assertJsonPath('data.user.id', $user->id)
+        ->assertJsonPath('data.user.uuid', $user->uuid);
     $this->assertDatabaseHas('mobile_sessions', [
         'user_id' => $user->getKey(),
         'platform' => 'ios',

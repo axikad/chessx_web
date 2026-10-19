@@ -109,7 +109,8 @@ it('logs in and verifies an existing active account with a valid code', function
     ]);
 
     $response->assertOk()
-        ->assertJsonPath('data.user.id', $user->uuid)
+        ->assertJsonPath('data.user.id', $user->id)
+        ->assertJsonPath('data.user.uuid', $user->uuid)
         ->assertJsonPath('data.user.email', $user->email)
         ->assertJsonPath('data.is_new_user', false);
     $this->assertGuest();

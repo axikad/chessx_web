@@ -27,7 +27,8 @@ it('returns the authenticated active player profile', function () {
 
     $response->assertOk()->assertJson([
         'data' => [
-            'id' => $user->uuid,
+            'id' => $user->id,
+            'uuid' => $user->uuid,
             'username' => 'mobile_player',
             'name' => 'Mobile Player',
             'email' => 'mobile@example.test',
