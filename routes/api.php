@@ -16,6 +16,8 @@ use App\Http\Controllers\Api\V1\PlayerLeagueController;
 use App\Http\Controllers\Api\V1\PlayerLocationController;
 use App\Http\Controllers\Api\V1\PlayerProfileController;
 use App\Http\Controllers\Api\V1\UsernameAvailabilityController;
+use App\Http\Controllers\Api\V1\LeaderboardController;
+use App\Http\Controllers\Api\V1\HomeController;
 use App\Http\Middleware\EnsureActiveApiUser;
 use App\Http\Middleware\EnsureMobileAppleSignInIsEnabled;
 use App\Support\ApiResponse;
@@ -63,6 +65,10 @@ Route::prefix('v1')->name('api.v1.')->group(function (): void {
             Route::get('states', 'states')->name('states');
             Route::get('cities', 'cities')->name('cities');
         });
+
+        Route::get('leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
+
+        Route::get('home', HomeController::class)->name('home.show');
     });
 });
 
