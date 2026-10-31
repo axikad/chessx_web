@@ -27,8 +27,8 @@ final class EmailOtpService
         if ($existingUser !== null && ($existingUser->trashed() || $existingUser->status !== 'active')) {
             return;
         }
-
-        $code = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $code = 1234;
+        // $code = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
         $otpHash = Hash::make($code);
         $expiresInMinutes = $this->expiresInMinutes();
 

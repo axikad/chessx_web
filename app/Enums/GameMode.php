@@ -7,4 +7,5 @@ enum GameMode: string
     case Rated = 'rated';
     case Casual = 'casual';
     case Tournament = 'tournament';
+case Computer = 'computer';
 }
